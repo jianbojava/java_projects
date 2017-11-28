@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.ChargeOrderMapper">
+	<sql id="Base_Column_List">
+		sn,connectorID,startTime,endTime,IFNULL(totalPower,0.00)totalPower,IFNULL(totalElecMoney,0.00)totalElecMoney,IFNULL(totalSeviceMoney,0.00)totalSeviceMoney,IFNULL(totalMoney,0.00)totalMoney,stopReason,sumPeriod,mem_id,firm_id,status,pay_type,pay_status,pay_amount,remark
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.car.model.ChargeOrder">
+		insert into zxj_charge_order(sn,connectorID,startTime,endTime,totalPower,totalElecMoney,totalSeviceMoney,totalMoney,stopReason,sumPeriod,mem_id,firm_id,pay_type,notify_json,create_date,modify_date)
+		values(#{sn},#{connectorID},#{startTime},#{endTime},#{totalPower},#{totalElecMoney},#{totalSeviceMoney},#{totalMoney},#{stopReason},#{sumPeriod},#{mem_id},#{firm_id},#{pay_type},#{notify_json},now(),now())
+	</insert>
+	
+	<update id="updateM" parameterType="com.cocosh.car.model.ChargeOrder">
+		update zxj_charge_order 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(status)">status=#{status},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(remark)">remark=#{remark},</if>
+		</set> 
+		,modify_date=now() where sn in 
+		<foreach item="item" index="index" collection="sns" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.car.model.ChargeOrder">
+		update zxj_charge_order 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(connectorID)">connectorID=#{connectorID},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(startTime)">startTime=#{startTime},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(endTime)">endTime=#{endTime},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(totalPower)">totalPower=#{totalPower},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(totalElecMoney)">totalElecMoney=#{totalElecMoney},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(totalSeviceMoney)">totalSeviceMoney=#{totalSeviceMoney},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(totalMoney)">totalMoney=#{totalMoney},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(stopReason)">stopReason=#{stopReason},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sumPeriod)">sumPeriod=#{sumPeriod},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(mem_id)">mem_id=#{mem_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(firm_id)">firm_id=#{firm_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(status)">status=#{status},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(pay_status)">pay_status=#{pay_status},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(pay_amount)">pay_amount=#{pay_amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(remark)">remark=#{remark},</if>
+		</set> 
+		,modify_date=now() where sn=#{sn}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.ChargeOrder">
+		select o.sn,o.startTime,o.endTime,IFNULL(o.totalPower,0.00)totalPower,
+		IFNULL(o.totalElecMoney,0.00)totalElecMoney,IFNULL(o.totalSeviceMoney,0.00)totalSeviceMoney,
+		IFNULL(o.totalMoney,0.00)totalMoney,o.status,o.pay_status 
+		from zxj_charge_order o left join zxj_member m on o.mem_id=m.id 
+		where o.notify_json is null 
+		<if test="keywords!=null and keywords!=''">and (o.sn=#{keywords} or m.mobile=#{keywords})</if>
+		<if test="is_read!=null and is_read!=''">and o.is_read=#{is_read}</if>
+		<if test="status!=null and status!=''">and o.status=#{status}</if>
+		<if test="firm_id!=null and firm_id!=''">and o.firm_id=#{firm_id}</if>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by o.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryPageApp" parameterType="vo" resultType="com.cocosh.car.model.ChargeOrder">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_charge_order 
+		where mem_id=#{mem_id} 
+		<if test="status!=null and status!=''">
+			<!-- 未完成 -->
+			<if test="status==0">and (status=0 or (status<![CDATA[>]]>0 and pay_status=0))</if>
+			<!-- 已完成 -->
+			<if test="status==1">and status<![CDATA[>=]]>1 and status<![CDATA[<=]]>2 and pay_status=1</if>
+		</if>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.car.model.ChargeOrder">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_charge_order where sn=#{sn}
+	</select>
+	
+	<!-- 修改订单为已读 -->
+	<update id="updateIsRead" parameterType="String">
+		update zxj_charge_order set is_read=1 where sn=#{sn}
+	</update>
+	<!-- 查询未读订单数 -->
+	<select id="queryNoReadCount" resultType="Integer">
+		select count(sn) from zxj_charge_order where is_read=0 and notify_json is null 
+	</select>
+	
+	<!-- 查询订单中所有的企业 -->
+	<select id="queryFirmFromOrder" resultType="com.cocosh.member.model.Firm">
+		SELECT f.id,f.name from (SELECT DISTINCT firm_id from zxj_charge_order WHERE firm_id IS NOT NULL)o 
+		LEFT JOIN zxj_firm f ON o.firm_id=f.id 
+	</select>
+	
+	<!-- 正在充电的订单 -->
+	<select id="queryValid" parameterType="String" resultType="com.cocosh.car.model.ChargeOrder">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_charge_order where mem_id=#{mem_id} and (status=0 or pay_status=0) limit 0,1
+	</select>
+	
+	<!-- 添加充电订单详情 -->
+	<insert id="addOrderDetail" parameterType="com.cocosh.car.model.ChargeOrderDetail">
+		insert into zxj_charge_order_detail(detailStartTime,detailEndTime,elecPrice,sevicePrice,detailPower,detailElecMoney,detailSeviceMoney,orderSn) values 
+		<foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.detailStartTime},#{item.detailEndTime},#{item.elecPrice},#{item.sevicePrice},#{item.detailPower},#{item.detailElecMoney},#{item.detailSeviceMoney},#{item.orderSn}) 
+	    </foreach>
+	</insert>
+	
+	<delete id="delOrderDetail" parameterType="String">
+		delete from zxj_charge_order_detail where orderSn=#{sn}
+	</delete>
+	
+	<!-- 查找订单详情 -->
+	<select id="queryOrderDetail" parameterType="String" resultType="com.cocosh.car.model.ChargeOrderDetail">
+		select detailStartTime,detailEndTime,elecPrice,sevicePrice,detailPower,detailElecMoney,detailSeviceMoney from zxj_charge_order_detail where orderSn=#{sn}
+	</select>
+	
+	<!-- 订单导出 -->
+	<select id="queryExport" parameterType="vo" resultType="com.cocosh.car.model.ChargeOrderExport">
+		select o.sn,o.connectorID,o.startTime,o.endTime,IFNULL(o.totalPower,0.00)totalPower,
+		IFNULL(o.totalElecMoney,0.00)totalElecMoney,IFNULL(o.totalSeviceMoney,0.00)totalSeviceMoney,
+		IFNULL(o.totalMoney,0.00)totalMoney,IFNULL(o.pay_amount,0.00) pay_amount,o.stopReason,o.status,o.pay_status,o.pay_type,o.remark,m.name mem_name,m.mobile mem_mobile,f.name firm_name     
+		from zxj_charge_order o left join zxj_member m on o.mem_id=m.id left join zxj_firm f on m.firm_id=f.id 
+		where o.notify_json is null 
+		<if test="keywords!=null and keywords!=''">and (o.sn=#{keywords} or m.mobile=#{keywords})</if>
+		<if test="status!=null and status!=''">and o.status=#{status}</if>
+		<if test="firm_id!=null and firm_id!=''">and o.firm_id=#{firm_id}</if>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by o.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+</mapper>

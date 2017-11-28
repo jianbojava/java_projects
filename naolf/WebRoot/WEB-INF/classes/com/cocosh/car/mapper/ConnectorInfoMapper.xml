@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.ConnectorInfoMapper">
+	<sql id="Base_Column_List">
+		connectorID,connectorName,connectorType,voltageUpperLimits,voltageLowerLimits,current,power,parkNo,stationID,equipmentID,status,enabled
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.car.model.ConnectorInfo">
+		insert into zxj_connectorInfo(connectorID,connectorName,connectorType,voltageUpperLimits,voltageLowerLimits,current,power,parkNo,stationID,equipmentID,create_date,modify_date,status,enabled) values 
+		<foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.connectorID},#{item.connectorName},#{item.connectorType},#{item.voltageUpperLimits},#{item.voltageLowerLimits},#{item.current},#{item.power},#{item.parkNo},#{item.stationID},#{item.equipmentID},now(),now(),1,0) 
+	    </foreach>
+	    ON DUPLICATE KEY UPDATE connectorName=VALUES(connectorName),
+	    connectorType=VALUES(connectorType),
+	    voltageUpperLimits=VALUES(voltageUpperLimits),
+	    voltageLowerLimits=VALUES(voltageLowerLimits),
+	    current=VALUES(current),
+	    power=VALUES(power),
+	    parkNo=VALUES(parkNo),
+	    stationID=VALUES(stationID),
+	    equipmentID=VALUES(equipmentID),
+	    status=VALUES(status),
+	    modify_date=now()
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update zxj_connectorInfo set enabled=#{del_flg} where connectorID in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.car.model.ConnectorInfo">
+		update zxj_connectorInfo 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(connectorName)">connectorName=#{connectorName},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(connectorType)">connectorType=#{connectorType},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(voltageUpperLimits)">voltageUpperLimits=#{voltageUpperLimits},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(voltageLowerLimits)">voltageLowerLimits=#{voltageLowerLimits},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(current)">current=#{current},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(power)">power=#{power},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(parkNo)">parkNo=#{parkNo},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(stationID)">stationID=#{stationID},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(equipmentID)">equipmentID=#{equipmentID},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(status)">status=#{status},</if>
+		</set> 
+		,modify_date=now() where connectorID=#{connectorID}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.ConnectorInfo">
+		select  c.connectorID,c.connectorName,c.connectorType,c.voltageUpperLimits,c.voltageLowerLimits,c.current,c.power,c.parkNo,c.stationID,c.equipmentID,c.status,c.enabled,s.stationName
+		from zxj_connectorInfo c LEFT JOIN zxj_stationInfo s ON c.stationID=s.stationID
+		<where>
+			<if test="keywords!=null and keywords!=''">(c.connectorID like '%${keywords}%' or c.connectorName like '%${keywords}%' or s.stationName like '%${keywords}%')</if>
+		</where>
+		order by c.create_date desc
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.car.model.ConnectorInfo">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_connectorInfo where connectorID=#{connectorID}
+	</select>
+	
+	<select id="queryConnCount" parameterType="String" resultType="com.cocosh.car.model.ConnectorInfo">
+		select (select count(0) from zxj_connectorinfo WHERE power<![CDATA[>=]]>30 AND status=1 AND enabled=0 AND stationID=#{stationID}) as freeQuickNum,
+		(select count(0) from zxj_connectorinfo where power<![CDATA[>=]]>30 AND enabled=0 AND stationID=#{stationID}) as totalQuickNum,
+		(select count(0) from zxj_connectorinfo where power<![CDATA[<]]>30 AND status=1 AND enabled=0 AND stationID=#{stationID}) as freeSlowNum,
+		(select count(0) from zxj_connectorinfo where power<![CDATA[<]]>30 AND enabled=0 AND stationID=#{stationID}) as totalSlowNum
+	</select>
+	
+	<select id="queryConnByStationID" parameterType="String" resultType="com.cocosh.car.model.ConnectorInfo">
+		select connectorID,connectorName,parkNo,status,power,connectorType from zxj_connectorInfo where stationID=#{stationID} and enabled=0
+	</select>
+	
+	<select id="queryByIdApp" parameterType="String" resultType="com.cocosh.car.model.ConnectorInfo">
+		select c.connectorID,c.connectorName,c.parkNo,c.ConnectorType,c.status,c.power,c.stationID,s.stationName from zxj_connectorInfo c 
+		left join zxj_stationInfo s on c.stationID=s.stationID 
+		where c.connectorID=#{connectorID}
+	</select>
+	
+	<delete id="delT">
+		delete from zxj_connectorInfo where connectorID in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+</mapper>

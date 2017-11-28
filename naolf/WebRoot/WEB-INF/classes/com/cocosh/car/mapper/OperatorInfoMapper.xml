@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.OperatorInfoMapper">
+	<sql id="Base_Column_List">
+		operatorID,operatorName,operatorTel1,operatorTel2,operatorRegAddress,operatorNote,enabled
+	</sql>
+	
+	<insert id="add" parameterType="java.util.List">
+		insert into zxj_operatorInfo(operatorID,operatorName,operatorTel1,operatorTel2,operatorRegAddress,operatorNote,create_date,modify_date,enabled) values 
+		<foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.operatorID},#{item.operatorName},#{item.operatorTel1},#{item.operatorTel2},#{item.operatorRegAddress},#{item.operatorNote},now(),now(),0) 
+	    </foreach>
+	    ON DUPLICATE KEY UPDATE operatorID=VALUES(operatorID),
+	    operatorName=VALUES(operatorName),
+	    operatorTel1=VALUES(operatorTel1),
+	    operatorTel2=VALUES(operatorTel2),
+	    operatorRegAddress=VALUES(operatorRegAddress),
+	    operatorNote=VALUES(operatorNote),
+	    modify_date=now()
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update zxj_operatorInfo set enabled=#{del_flg} where operatorID in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.car.model.OperatorInfo">
+		update zxj_operatorInfo 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(operatorName)">operatorName=#{operatorName},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(operatorTel1)">operatorTel1=#{operatorTel1},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(operatorTel2)">operatorTel2=#{operatorTel2},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(operatorRegAddress)">operatorRegAddress=#{operatorRegAddress},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(operatorNote)">operatorNote=#{operatorNote},</if>
+		</set> 
+		,modify_date=now() where operatorID=#{operatorID}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.OperatorInfo">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_operatorInfo 
+		<where>
+			<if test="keywords!=null and keywords!=''">(operatorName like '%${keywords}%' or operatorID=#{keywords})</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.car.model.OperatorInfo">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_operatorInfo where operatorID=#{operatorID}
+	</select>
+	
+	<select id="queryAll" resultType="com.cocosh.car.model.OperatorInfo">
+		select operatorID,operatorName from zxj_operatorInfo order by create_date desc
+	</select>
+	
+</mapper>

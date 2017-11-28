@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.TcommentMapper">
+	<sql id="Base_Column_List">
+		id,isserious,isprogress,ishelp,isteam,isspeak,isstar,teacher,comment,appoint_id,create_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.Tcomment">
+		insert into nlf_tcomment(id,isserious,isprogress,ishelp,isteam,isspeak,isstar,teacher,comment,appoint_id,create_date)
+		values(#{id},#{isserious},#{isprogress},#{ishelp},#{isteam},#{isspeak},#{isstar},#{teacher},#{comment},#{appoint_id},now())
+	</insert>
+	
+	<delete id="del">
+		delete from nlf_tcomment where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</delete>
+	
+	<update id="update" parameterType="com.cocosh.nlf.model.Tcomment">
+		update nlf_tcomment 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(isserious)">isserious=#{isserious},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(isprogress)">isprogress=#{isprogress},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(ishelp)">ishelp=#{ishelp},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(isteam)">isteam=#{isteam},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(isspeak)">isspeak=#{isspeak},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(isstar)">isstar=#{isstar},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(teacher)">teacher=#{teacher},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(comment)">comment=#{comment},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(appoint_id)">appoint_id=#{appoint_id},</if>
+		</set> 
+		 where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.Tcomment">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_tcomment 
+		<where>
+			<if test="keywords!=null and keywords!=''">comment like '%${keywords}%'</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.Tcomment">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_tcomment where id=#{id}
+	</select>
+	
+	<select id="queryByappoint_Id" parameterType="String" resultType="com.cocosh.nlf.model.Tcomment">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_tcomment where appoint_id=#{appoint_id} limit 0,1
+	</select>
+	
+	
+	<select id="queryteacher" parameterType="String" resultType="String">
+		select c.teacher from nlf_course c left join nlf_appoint a on c.id=a.course_id where a.id=#{appoint_id}
+	</select>
+	
+</mapper>

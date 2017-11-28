@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.LcommentMapper">
+	<sql id="Base_Column_List">
+		id,user_ticket_id,user_id,lesson_id,serveice_num,profess_num,satify_num,comm_num,content,create_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.Lcomment">
+		insert into nlf_lcomment(id,user_ticket_id,user_id,lesson_id,serveice_num,profess_num,satify_num,comm_num,content,create_date)
+		values(#{id},#{user_ticket_id},#{user_id},#{lesson_id},#{serveice_num},#{profess_num},#{satify_num},#{comm_num},#{content},now())
+	</insert>
+	
+	<delete id="del">
+		delete from nlf_lcomment where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</delete>
+	
+	<update id="update" parameterType="com.cocosh.nlf.model.Lcomment">
+		update nlf_lcomment 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(user_ticket_id)">user_ticket_id=#{user_ticket_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(user_id)">user_id=#{user_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(lesson_id)">lesson_id=#{lesson_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(serveice_num)">serveice_num=#{serveice_num},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(profess_num)">profess_num=#{profess_num},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(satify_num)">satify_num=#{satify_num},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(comm_num)">comm_num=#{comm_num},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(content)">content=#{content},</if>
+		</set> 
+		 where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.Lcomment">
+		select 
+		c.*,l.name lesson_name,u.username user_name
+		from nlf_lcomment c left join nlf_lesson l on c.lesson_id=l.id left join sys_user u on c.user_id=u.id
+		<where>
+			<if test="keywords!=null and keywords!=''">l.name like '%${keywords}%'</if>
+			<if test="conn_id!=null and conn_id!=''">c.lesson_id=#{conn_id}</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryAll" parameterType="com.cocosh.nlf.model.Lcomment" resultType="com.cocosh.nlf.model.Lcomment">
+		select * from nlf_lcomment
+		  <where>
+			<if test="id!=null and id!=''">and id=#{id}</if>
+			<if test="user_id!=null and user_id!=''">and user_id=#{user_id}</if>
+			<if test="user_ticket_id!=null and user_ticket_id!=''">and user_ticket_id=#{user_ticket_id}</if>
+			
+		</where>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.Lcomment">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_lcomment where id=#{id}
+	</select>
+	
+	<select id="queryByUtId" parameterType="String" resultType="com.cocosh.nlf.model.Lcomment">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_lcomment where user_ticket_id=#{user_ticket_id}
+	</select>
+	
+</mapper>

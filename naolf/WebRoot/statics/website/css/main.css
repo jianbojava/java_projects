@@ -1,0 +1,446 @@
+/*******************************************************************************
+ * 一、公共样式
+ ******************************************************************************/
+.w1000{ width:1000px;margin:0 auto; }
+.hidden{display:none!important;}
+.mobile-block{display:none!important;}/*当手机模式时以display:block的形式显示*/
+.mobile-cell{display:none!important;}/*当手机模式时以display:table-cell的形式显示*/
+/*横向列表*/
+ul.list-horizontal{display:block; position:relative;}
+ul.list-horizontal li{display:inline-block; padding:0px 20px;}
+
+/*滚动到顶部按钮*/
+.btn-scroll-top {display:inline-block;position:fixed;visibility:hidden;width:40px;height:50px;bottom:40px;right:10px;background:url(../images/top_arrow.png) no-repeat center 50%;overflow:hidden;opacity:0; -webkit-transition: all 0.3s;-moz-transition: all 0.3s;transition: all 0.3s;}
+.btn-scroll-top.is-visible {visibility:visible;opacity:1;}
+.btn-scroll-top.fade-out {opacity: .5;}/* 如果用户继续向下滚动,这个按钮的透明度会变得更低 */
+.no-touch .cd-top:hover {background-color: #e86256;opacity: 1;}
+
+/*******************************************************************************
+ * 二、CSS图标
+ ******************************************************************************/
+/*叉形式图标*/
+.icon-close{display:block;position:relative;color:transparent;width:30px;height:30px;}
+.icon-close:before,.icon-close:after{content: ""; position:absolute; top:15px; left:0px; width:100%;height:2px;background-color:#3d3d3d;z-index:90;}
+.icon-close:before{-webkit-transform :rotate(45deg);-ms-transform:rotate(45deg) ;transform:rotate(45deg);}
+.icon-close:after{-webkit-transform :rotate(135deg);-ms-transform:rotate(135deg) ;transform:rotate(135deg);}
+.btn-close:hover .icon-close{transform:scale(0.8,0.8);-webkit-transform: scale(0.8,0.8);-ms-transform: scale(0.8,0.8);}
+/*三条横向短线图标*/
+.icon-menu{display:block; position:relative; width:100%; height:3px; top:50%; margin-top:-2px; background-color:#8a8a8a;}/*中间横线高4px,利用top:50%将横线居中*/
+.icon-menu:after,.icon-menu:before{content: "";display: block; position: absolute; height:3px; left:0; width:100%; background-color:#8a8a8a;}
+.icon-menu:after{top:-8px;}
+.icon-menu:before{top:8px;}
+.btn-menu:hover .icon-menu:before{transform: translateY(-1px) rotate(0deg); -webkit-transform: translateY(-1px) rotate(0deg); -ms-transform: translateY(-1px) rotate(0deg);}
+.btn-menu:hover .icon-menu:after{transform: translateY(1px) rotate(0deg); -webkit-transform: translateY(1px) rotate(0deg); -ms-transform: translateY(1px) rotate(0deg);}
+/*下箭头图标*/
+.icon-down-arrow:after{content:""; position: absolute; top:50%; left:50%; margin:-7px 0 0 -6px; width:16px; height:16px; border-left:3px solid #fff; border-top:3px solid #fff;-webkit-transform: rotate(-135deg); -ms-transform: rotate(-135deg); transform: rotate(-135deg);}
+.btn-down-arrow{position:absolute; width:30px; height:44px; left:50%; bottom:30px;margin-left:-15px;}
+.btn-down-arrow a{display:block;width:100%;height:100%;}
+/*左右箭头图标*/
+.icon-left-arrow:after{content:""; position: absolute; top:50%; left:50%; margin:-7px 0 0 -6px; width:16px; height:16px; border-left:3px solid #fff; border-top:3px solid #fff;-webkit-transform: rotate(-45deg); -ms-transform: rotate(-45deg); transform: rotate(-45deg);}
+.icon-right-arrow:after{content:""; position: absolute; top:50%; left:50%; margin:-7px 0 0 -6px; width:16px; height:16px; border-left:3px solid #fff; border-top:3px solid #fff;-webkit-transform: rotate(135deg); -ms-transform: rotate(135deg); transform: rotate(135deg);}
+/*关闭菜单按钮*/
+.btn-close-menu{position:absolute;cursor:pointer}
+
+/*******************************************************************************
+ * 三、CSS动画
+ ******************************************************************************/
+/*顶图大标题动画*/
+ /*
+.word-animator .word1{animation-delay:500ms;-webkit-animation-delay:500ms;}
+.word-animator .word2{animation-delay:577ms;-webkit-animation-delay:577ms;}
+.word-animator .word3{animation-delay:654ms;-webkit-animation-delay:654ms;}
+.word-animator .word4{animation-delay:731ms;-webkit-animation-delay:731ms;}
+*/
+
+
+/*******************************************************************************
+ * 四、主菜单
+ ******************************************************************************/
+/*顶部导航主菜单容器窗口*/
+header{display:block; position:relative; top:64px; height:60px; width:100%; z-index: 40;}
+header .logo{position:relative; float:left; width:30%; height:100%;text-align:center;}
+header .logo img{width:34%;margin-top:-14px;}
+header .menucontainer{display:block; position:relative; float:right; width:65%;}
+header .language{display:block; position:relative; float:left; width:30%;color:#fff;text-align:center;}
+header .btn-close{position:absolute; top:15px; right:12px;z-index:999;}
+header .btn-menu{display:block; position:relative; width:100%;}
+/*导航菜单基本样式*/
+header .navigate{margin:0 auto;text-align:center;}
+header .navigate li{display:inline-block; position:relative; overflow:hidden;}
+header .navigate a{display:block; position:relative; width:100%;color:#fff; text-align:center;}
+header .navigate a:after {content:" "; display:block; position:absolute; left:50%; width:0; bottom:0; -webkit-transition: width .3s, left .3s; -moz-transition: width .3s, left .3s; transition: width .3s, left .3s;}
+/*主导航菜单和语言选择导航菜单样式*/
+header .nav-main a{padding:0px 15px 8px 15px;}
+header .nav-main a.on{color:#fff;}/*当前选中的菜单变化字体font-family:"Brown-Bold";*/
+header .nav-main a.on:after,header .nav-main a.on:hover:after{left:0%; width:100%; border-bottom:2px solid #6cd15f;}/*下划线从50%处向左移，宽度从0增加到100，效果表现为下划线从中间向两边展开*/
+header .nav-main a:hover:after{left:0%; width:100%; border-bottom:2px solid #6cd15f;}/*鼠标划过时透明度减少*/
+header .nav-lang a.on:after, header .nav-lang a:hover:after {left:0%; width:100%; border-bottom:2px solid #6cd15f;}
+header .nav-lang a{padding:0px 0px 5px 0px;}
+
+/*底部导航*/
+footer{display:block; position:relative; padding:48px 0 25px; text-align:center; background-color:#d0d0d0;}
+footer ul.list-horizontal.sns li{padding:0px 14px;}
+footer ul.list-horizontal.sns li img{height:25px;}
+footer ul.list-horizontal.location{margin-top:25px;}
+footer ul.list-horizontal.location li{padding:0px 8px;font-size:1.6em;color:#787878;}
+footer .copyright{margin-top:3em; font-size:1.4em;}
+footer .copyright span{display:inline-block;color:#787878;}
+footer .copyright span a{ color:#787878; -webkit-transition:all .3s ease; -moz-transition:all .3s ease; -ms-transition:all .3s ease; transition:all .3s ease;}
+footer .copyright span a:hover{ color:#ff5b00; }
+
+/*修改底部*/
+section.contact{ width:100%; position:relative; text-align:center; }
+/* .contactH{ display:inline-block; margin-right:2em;vertical-align:middle; }
+.contactH h3 a{ font-size:2.5em; color:#ff5b00; line-height:200%; }
+.contactH p{ font-size:1.5em;  } */
+.contactH{ width: 220px; display:inline-block; margin-right:2em; /* vertical-align:middle; */}
+.contactH h3 a{ font-size:2.5em; color:#ff5b00; /* line-height:200%; */ }
+.contactH p{ font-size:1.5em;  margin-top: 10px;}
+section.contact img{ vertical-align:top; }
+
+.cy_company{ margin-top:15px;}
+.cy_company img{ width:220px;}
+
+/*******************************************************************************
+ * 五、Home,Company,News,Racing,JoinUs四个版块主页面的样式
+ ******************************************************************************/
+ /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ * ●首屏欢迎页效果
+ *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+ /*1、首屏欢迎页*/
+.page-welcome{display:block; position:relative; width:100%;height:100vh;background-repeat:no-repeat;background-position:center top;background-color:rgb(22, 27, 28); background-size:cover;} /*全屏页*/
+.page-welcome .content{display:table; position:absolute; height:100%; width:100%; top:0; padding-top:90px; padding-left:42%;}/*存放标题性内容*/
+.page-welcome .title{display:table-cell;font-size:7em;color:#fff;vertical-align:middle;}/*大标题字*/
+.page-welcome .title span{display:inline-block; white-space:pre-wrap;}
+.page-welcome .title .period{color:#0DD6C9;}/*句号*/
+.page-welcome .title .readmore{margin-top:20px;font-size:0.4em;}/*点击阅读*/
+.page-welcome .title .readmore a{display:inline-block; color:#fff;border-bottom:1px solid #6cd15f;}
+.head-backgrounds{display:block;position:absolute;width:100%;height:100vh;left:0;top:0;}
+.head-backgrounds li{display:block;position:absolute;width:100%;height:100vh;left:0;top:0;background-repeat:no-repeat;background-position:center top;background-color:rgb(22, 27, 28); background-size:cover;}
+
+/*2、语言切换按钮*/
+.btn-lang-switcher{display:none; position:absolute;height:100%;}
+.btn-lang-switcher li{display:block; position:relative;float:left; width:45px;height:100%; overflow:hidden; font-size:1.6em;}
+.btn-lang-switcher a{display:block; position:relative;width:100%;height:100%; color:#8a8a8a; text-align:center;vertical-align:middle;}
+.btn-lang-switcher .text a{line-height:60px;}
+.btn-lang-switcher .icon a{width:28px;float:right;margin-right:8px;}
+ 
+ 
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ * ●公司页面效果
+ *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+/*1、公司页首屏背景图*/
+.page-welcome.companybg{background-image:url(../images/index1.jpg);}
+/*2、公司页内容区样式*/
+.page-company section{padding:50px 0px 0px 0px;}
+.page-company section .icon{height:96px;background:no-repeat center center;background-size:auto 88px;}
+.page-company section .title{padding:20px 0px;font-size:4.2em;text-align:center;}
+.page-company section .text-container{padding:0px 12%; margin:10px 0px;}
+.page-company section .text{float:left;font-size:1.5em;width:100%;padding:0px 20px;line-height:1.6em;}
+.page-company section .text p{ font-size:18px; line-height:28px; text-align:center; width:1000px; margin:20px auto;}
+.page-company section .text.textLeft p{ text-align:left; }
+.page-company section img{width:100%;}
+.page-company section.mission .icon{background-image:url(../images/mission.png);}
+.page-company section.future .icon{background-image:url(../images/about.png);}
+.page-company section.future .readmore{text-align:center;margin-bottom:5em;}
+.page-company section.future .readmore a{color:#13d4c8;font-size:1.4em;}
+.page-company section.team{margin-bottom:60px;}
+.page-company section.team .icon{background-image:url(../images/team_icon.png);}
+.page-company section.team span{display:block;}
+.page-company section.team .name{font-weight:bold;}
+.page-company section.team .position{color:#494949;}
+.page-company section.team .experience{color:#B1B1B1;}
+.mobile_mission_img_text{ display: none;}
+
+/*合作伙伴*/
+.page-company section.partner{ width:100%; position:relative; background:#f2f2f2; padding:80px 0; margin-top:60px; float:left;}
+.page-company section.partner h1{ color:#333; font-size:6em; line-height:150%; text-align:center; margin-bottom:1em; }
+.page-company section.partner ul{ text-align:center; }
+.page-company section.partner ul li{ width:25%; text-align:center; float:left; display:box; display:-webkit-box; box-align:center; -webkit-box-align:center; box-pack:center; -webkit-box-pack:center; margin-bottom:3em;}
+.page-company section.partner ul li img{ vertical-align:middle; max-width:100%; }
+.page-company section.partner ul li.w33{ width:32%; }
+.page-company section.faMt0{padding:0;}
+
+/*加入我们*/
+.page-welcome.joinUs{ background-image:url(../images/joinus.jpg); }
+.page-welcome .content.Cent{padding-left:0; text-align:center;}
+.page-company section.joinUs{ margin:50px 0 100px;padding:0; width:100%; position:relative;}
+.page-company section.joinUs h2{ font-size:3em; border-bottom:#000 solid 2px; padding-bottom:0.5em; }
+.page-company section.joinUs h2 span{ line-height:150%; border-left:#71af49 solid 3px; padding-left:1em; }
+.joinD{ width:100%; position:relative; display:flex; display:-webkit-flex; flex:1; -webkit-flex:1; margin-top:30px; }
+.joinLeft dl{ margin:20px 0;}
+.joinLeft{ width:25%; }
+.joinRight{ width:70%; }
+.joinLeft dl dt,.joinLeft dl dd{ font-size:1.6em; line-height:150%; }
+.joinRight h3{ font-size:2.2em; line-height:200%; margin:1em 0; color:#000; }
+.joinRight p{ font-size:1.4em; line-height:150%; margin-bottom:0.8em; }
+
+
+
+
+/*9.12新增-by Alice*/
+
+.clearfix:after{ content:""; visibility:hidden; display:block; height:0; clear:both; }
+.clearfix{ zoom:1; }
+
+/*新闻详情*/
+.page-welcome.companybg.cy_newsbg{ background-image:url(../images/company_detail.jpg); }
+.page-company .cy_mission{ padding:20px 0; }
+.cy_mission .text p{ text-align:center; }
+.page-company .cy_mission .text p{ font-size:2em; line-height:40px; }
+.page-company .cy_mission .text p span{ font-size:14px; }
+.page-company .cy_mission .text p span.date{ margin-left:10px; }
+.page-company .cy_mission .text p span.gray{ color:#ada9a4; }
+.page-company section .text-container-1{padding:0px 6%; margin:10px 0px;}
+.page-company .cy_mission .text-container-1 .text p{ font-size:1em; margin:10px 0; width:100%; line-height:28px; text-align:left; }
+.page-company section img{ width:auto; max-width:100%; }
+.page-company section .text-img{ text-align:center; }
+
+
+/*下载*/
+.page-welcome.companybg.downloadbg{ background-image:url(../images/download.png); }
+.download_title{ text-align:center; }
+.page-company section img.download_icon{ width:60px; vertical-align:middle; margin-right:20px; }
+.download_title span{ font-size:2em; }
+.scan_left,.scan_right{ width:50%; text-align:center; }
+.fl{ float:left; }
+.fr{ float:right; }
+.bold{ font-weight:bold; }
+.f16{ font-size:16px; }
+.mTop50{ margin-top:50px; }
+
+.scan_code{ margin-top:40px; }
+.scan_text1{ margin-top:15%; }
+.scan_text2{ margin:15px 0; }
+
+
+/*新闻列表*/
+.page-company section.cy_news_list{ padding:0; }
+.cy_news_list .news_list_title{ font-size:3em; color:#74726d; padding:0 5%; line-height:60px; background:#f3f2f1; }
+.page-company section.news_list_con{ padding:40px 5%; }
+.list_item{ margin-top:40px; display:flex; }
+.list_item:first-child{ margin-top:0px; }
+.item_left{ width:295px; }
+.item_right{ margin-left:2%; padding:15px 0; border-bottom:1px solid #ccc; flex:1; }
+.item_right h4{ font-size:2.5em; }
+.item_right p span.date{ margin-left:10px; }
+.item_right p span.gray{ color:#ada9a4; }
+.item_right p.txt{ margin:10px 0; }
+.item_right p.txt_con{ font-size:14px; line-height:22px; max-height:66px; overflow:hidden; }
+.item_right p.show_more{ margin-top:15px; }
+.item_right p.show_more a{ font-size:14px; color:#2c96e2; }
+.item_right p.show_more a:hover{ text-decoration:underline; }
+
+.page{ margin-top:30px; text-align:center; }
+.page ul{ text-align:center; display:inline-block; }
+.page ul li{ float:left; }
+.page ul li{ margin-right:5px; }
+.page ul li:last-child{ /*margin-left:10px; */}
+.page ul li a{ padding:5px 8px; border:1px solid #ccc; text-align:center; }
+.page ul li a.on{ background:#0A8FE0; border:1px solid #0A8FE0; color:#fff; }
+.page ul li a.arrow{ color:#ccc; }
+
+
+/*响应国家新能源汽车产业及发展分享经济宏观战略，智行家以园区企业出行需求为导向，充分利用新能源车的优势，打造全新一代的绿色出行文化。*/
+/*******************************************************************************
+ * 六、屏幕自适应样式调整
+ ******************************************************************************/
+@media screen and (max-width:2280px){/*超大桌面显示器*/
+    /*调整导航菜单*/
+    header .logo img{width:35%;}/*重新调整logo大小*/
+    header .nav-main li{font-size:1.8em; width:115px;}/*重新调整主菜单字体大小*/
+    header .nav-lang li{font-size:1.6em; width:60px;}/*重新调整语言栏字体大小*/
+
+    /*调整公司页*/
+    /*.companybg .btn-down-arrow{display:none;}公司页在电脑上不显示底部箭头*/
+    .page-welcome.companybg .title{font-size:7em;}
+    
+    /*调整竞赛页*/
+    .page-welcome.racingbg .title{font-size:8em;}
+    
+    /*调整新闻页*/
+    .page-welcome.newsbg .title{font-size:6.7em;}
+    
+    /*调整加入我们页*/
+    .page-welcome.joinusbg .title{font-size:8em;}
+    .desktop_mission_img_text{position: absolute; top:43%;}
+    .desktop_mission_img_text p{ font-size:5.5em; width:60%; margin:0 auto; text-align:center; line-height:150%:;}
+    .desktop_mission_img_text.future{ width:100%; top:20%; }
+    .desktop_mission_img_text.future strong{ font-size:7em; color:#fff; margin-right:1em; }
+    .desktop_mission_img_text.future p{ display:inline-block; vertical-align: top; font-size:2em; text-align:left; line-height:200%; }
+    .sectionFatu{ position:relative; -webkit-box-shadow:0 5px 15px rgba(0,0,0,0.5); -moz-box-shadow:0 5px 15px rgba(0,0,0,0.5); -ms-box-shadow:0 5px 15px rgba(0,0,0,0.5); box-shadow:0 5px 15px rgba(0,0,0,0.5); z-index:1; }
+  
+
+}
+
+
+
+/******************************************************************************/
+@media screen and (max-width:1440px){/*<=1440大桌面显示器*/
+	/*调整导航菜单*/
+	header .nav-main li{font-size:1.6em; width:100px;}/*重新调整主菜单字体大小*/
+	header .nav-lang li{font-size:1.4em; width:50px;}/*重新调整语言栏字体大小*/
+	
+	/*调整公司*/
+	.page-welcome.companybg .title{font-size:6.3em;}
+	
+}
+
+
+/******************************************************************************/
+@media screen and (max-width:1240px){/*<=1240桌面显示器*/
+	/*调整导航菜单*/
+	header .nav-main li{font-size:1.4em; width:95px;}/*重新调整主菜单字体大小*/
+	header .nav-lang li{font-size:1.2em; width:45px;}/*重新调整语言栏字体大小*/
+	header .logo img{margin-top:-20px;}
+	
+	/*调整公司页*/
+	.page-welcome.companybg .title{font-size:5.4em;}
+	.desktop_mission_img_text{position: absolute;top: 50% }
+	.desktop_mission_img_text p{ font-size: 4.3em;}
+
+	/*调整底脚*/
+	footer ul.list-horizontal.sns li{padding:0px 10px;}
+	footer ul.list-horizontal.sns li img{height:22px;}
+	footer ul.list-horizontal.location{margin-top:25px;}
+	footer ul.list-horizontal.location li{padding:0px 8px;font-size:1.2em;}
+	footer .copyright span{font-size:1em;}
+}
+
+
+/******************************************************************************/
+@media screen and (max-width:992px){/*<=992平板*/
+	/*调整导航菜单*/
+	.w1000{ width:100%; }
+	header .nav-main li{font-size:1.2em; width:74px;}/*重新调整主菜单字体大小*/
+	header .nav-lang li{font-size:1em; width:42px;}/*重新调整语言栏字体大小*/
+	header .nav-main a{padding: 0px 10px 10px 10px;}
+	header .logo img{margin-top:-15px;}
+	
+	/*调整公司页*/
+	.page-welcome.companybg .title{font-size:4.5em;}
+	.desktop_mission_img_text{position: absolute;top: 50%; }
+	.desktop_mission_img_text p{ font-size: 4.5em;}
+	
+	/*调整欢迎页*/
+	.page-welcome.newsbg .title{font-size:4.5em;}
+	.page-welcome .title{font-size:6.5em;}/*调整每页欢迎屏的标题字体大小*/
+
+	/*修改*/
+	.page-company section .text p{ width:100%; }
+
+	/*加入我们*/
+	.page-company section.joinUs{ width:90%; margin:50px 5% 100px; }
+	
+}
+
+
+/******************************************************************************/
+@media screen and (max-width:800px){/*<=800手机*/
+	/*隐藏桌面部件，显示手机部件*/
+	.desktop-block{display:none!important;}/*隐藏桌面环境下的相关元素*/
+	.mobile-block{display:block!important;}/*以display:block的形式显示手机下的相关元素*/
+	.mobile-cell{display:table-cell!important;}/*以display:table-cell的形式显示手机下的相关元素*/
+	/*调整浮层*/
+	.overlay .wrap{padding: 70px 16px 16px 16px;}
+	.overlay .container{width:100%;height:100%;max-width:none;max-height:none;}/*浮动窗口全屏*/
+	.overlay .container .content{overflow-y:auto;}
+	.overlay .btn-close-overlay{width:48px;height:48px;top:-57px;background-size:48px 48px;}
+	
+	/*导航菜单调整*/
+	header{top:0px;}
+	header .menucontainer{position:fixed;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5);}
+	header .menucontainer.hide{display:none;}
+	header .navigate{position:absolute;top:0px;right:0px;width:65%;height:100%;background-color:#fff;padding-top:80px}
+	header .navigate li{display:block; width:100%; padding:0px 15px;}
+	header .navigate a{color:#3c3c3c!important;padding:1em 0px;text-align:left;}/*通过padding设置每个菜单高度*/
+	header .navigate a:after{border-bottom:1px solid #C5C5C5;left:0;width:100%;}
+	header .navigate li:first-child a{border-top:1px solid #C5C5C5;left:0;width:100%;}
+	header .logo{width:300px;}
+	header .logo img {float:left; width:90px; margin:0 20px;}
+	header .nav-main li{font-size:1.6em;}
+	header .language{display:none;}
+	header .btn-lang-switcher{display:block;right:10px; top:1em; position:fixed; z-index:10;height:auto;}
+	header .btn-lang-switcher li:first-child{width:45px; height:45px; background:#fff; border:#ededed solid 1px; -webkit-border-radius:0.2em; border-radius:0.2em;}
+	
+	/*调整欢迎页*/
+	.btn-down-arrow{display:block!important;}
+	.page-welcome .title{font-size:4.5em;}
+	.page-welcome .title span{display:block;margin:0px 0px;}
+	
+	/*调整公司页*/
+	.page-company section .title{font-size: 3.2em;}
+	.page-welcome.companybg{background-image:url(../images/indexd1.jpg);}/*公司版块欢迎页背景图更换为手机版*/
+	.page-welcome.companybg .content{padding-top:60px;padding-left:0;width:100%; text-align:center;}
+	.page-welcome.companybg .title{font-size:3.5em;}
+	.page-company section .text-container{padding:0 1%;}
+	.page-company section .text{width:100%;}/*将电脑版中两栏的内容变为一栏*/
+	.page-company section.team .icon.coreteam{height:60px;background-size:auto 60px;}
+	.desktop_mission_img_text{display:none;}
+	.desktop_mission_img_text.future{ display:block; text-align:center; }
+	.desktop_mission_img_text p{font-size:3.2em;}
+	.mobile_mission_img_text{display:block; position:absolute; top:30%; text-align:center; width:90%; margin:0 5%; }
+	.mobile_mission_img_text p{font-size:3.2em;}
+	/*加入我们*/
+.page-welcome.joinUs{ background-image:url(../images/joinus.jpg); }
+
+
+
+	
+	
+	/*调整底脚*/
+	footer ul.list-horizontal.sns li img{height:30px;}
+	footer ul.list-horizontal.location{display:none;}
+	footer .copyright{margin-top:25px;}
+	footer .copyright span{display:inline-block;font-size:1.1em;margin-top:5px;}
+}
+@media screen and (max-width:640px){
+	.page-welcome.companybg .content{ width:90%; margin:0 5%; font-size:0.875em; }
+	.page-company section.partner h1{ font-size:4em; }
+	.contactH{ width:100%; text-align:center; margin-bottom:2em;margin-right:0; }
+	.mobile_mission_img_text{ width:90%; margin:0 5%; font-size:0.75em; }
+	.desktop_mission_img_text.future strong{ font-size:3em;margin-right:0; }
+	.desktop_mission_img_text.future p{ font-size:1.5em; }
+	.page-company section .text p{font-size:1em;}
+
+	/*加入我们*/
+	.joinD{ width:94%; margin:50px 3% 100px; display:block;}
+	.joinLeft, .joinRight{ width:100%; }
+	
+	.page-company .cy_mission .text p{font-size: 1.5em; line-height:30px; }
+	.download_title span{ font-size:1.5em; }
+	.scan_left{ width:54%; }
+	.scan_right{ width:42%; }
+	.scan_code{ padding:0 2%; }
+
+	.cy_news_list .news_list_title{ font-size:2em; }
+	
+	.item_right h4{ font-size:2em; }
+	
+}
+
+/******************************************************************************/
+@media screen and (max-width:320px){/*<=320手机*/
+	/*调整公司页*/
+	.page-company section .title{font-size: 3em;}
+    
+	.page-company .cy_mission .text p{font-size: 1.5em; line-height:30px; }
+	.download_title span{ font-size:1.5em; }
+	.scan_left{ width:54%; }
+	.scan_right{ width:42%; }
+	.scan_code{ padding:0 2%; }
+
+	.cy_news_list .news_list_title{ font-size:2em; }
+	
+	.list_item{ display:block; }
+	.item_right{ flex:none; }
+	.item_right h4{ font-size:2em; }
+}
+
+
+@media screen and (max-width:414px){
+	
+	.list_item{ display:block; }
+	.item_right{ flex:none; }
+	.item_right h4{ font-size:2em; }
+}

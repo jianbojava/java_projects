@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.CommentMapper">
+	<sql id="Base_Column_List">
+		id,mem_id,car_id,station_id,content,images,star,enabled,create_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.car.model.Comment">
+		insert into zxj_comment(id,mem_id,mem_name,car_id,station_id,content,images,star,enabled,create_date,modify_date)
+		values(#{id},#{mem_id},#{mem_name},#{car_id},#{station_id},#{content},#{images},#{star},0,now(),now())
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update zxj_comment set enabled=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.car.model.Comment">
+		update zxj_comment 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(mem_id)">mem_id=#{mem_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(car_id)">car_id=#{car_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(content)">content=#{content},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(images)">images=#{images},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(star)">star=#{star},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.Comment">
+		select cm.id,cm.mem_id,cm.car_id,cm.content,cm.images,cm.star,cm.enabled,cm.create_date,IF(cm.mem_id IS NULL,CONCAT(LEFT(cm.mem_name,3),'****',RIGHT(cm.mem_name,4)),CONCAT(LEFT(m.mobile,3),'****',RIGHT(m.mobile,4))) mem_name,m.mobile mem_mobile,c.number car_number,c.name car_name from zxj_comment cm 
+		left join zxj_car c ON cm.car_id=c.id LEFT JOIN zxj_member m ON cm.mem_id=m.id 
+		where cm.car_id IS NOT NULL 
+		<if test="keywords!=null and keywords!=''">and (cm.content like '%${keywords}%' or cm.mem_name like '%${keywords}%' or m.mobile like '%${keywords}%')</if>
+		<if test="star!=null and star!=''">and cm.star=#{star}</if>
+		<if test="enabled!=null and enabled!=''">and cm.enabled=#{enabled}</if>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by cm.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryStationPage" parameterType="vo" resultType="com.cocosh.car.model.Comment">
+		select cm.id,cm.mem_id,cm.station_id,cm.content,cm.images,cm.star,cm.enabled,cm.create_date,IF(cm.mem_id IS NULL,CONCAT(LEFT(cm.mem_name,3),'****',RIGHT(cm.mem_name,4)),CONCAT(LEFT(m.mobile,3),'****',RIGHT(m.mobile,4))) mem_name,m.mobile mem_mobile,s.stationName station_name from zxj_comment cm 
+		left join zxj_stationInfo s ON cm.station_id=s.stationID LEFT JOIN zxj_member m ON cm.mem_id=m.id 
+		where cm.station_id IS NOT NULL 
+		<if test="keywords!=null and keywords!=''">and (cm.content like '%${keywords}%' or cm.mem_name like '%${keywords}%' or m.mobile like '%${keywords}%')</if>
+		<if test="star!=null and star!=''">and cm.star=#{star}</if>
+		<if test="enabled!=null and enabled!=''">and cm.enabled=#{enabled}</if>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by cm.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryPageApp" parameterType="vo" resultType="com.cocosh.car.model.Comment">
+		SELECT c.id,c.content,c.images,c.star,c.create_date,IF(c.mem_id IS NULL,CONCAT(LEFT(c.mem_name,3),'****',RIGHT(c.mem_name,4)),CONCAT(LEFT(m.mobile,3),'****',RIGHT(m.mobile,4))) mem_name,m.head_img mem_headimg,m.type mem_type from zxj_comment c LEFT JOIN zxj_member m ON c.mem_id=m.id 
+		WHERE c.car_id=#{id} and c.enabled=0 
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by c.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryStationPageApp" parameterType="vo" resultType="com.cocosh.car.model.Comment">
+		SELECT c.id,c.content,c.images,c.star,c.create_date,IF(c.mem_id IS NULL,CONCAT(LEFT(c.mem_name,3),'****',RIGHT(c.mem_name,4)),CONCAT(LEFT(m.mobile,3),'****',RIGHT(m.mobile,4))) mem_name,m.head_img mem_headimg,m.type mem_type from zxj_comment c LEFT JOIN zxj_member m ON c.mem_id=m.id 
+		WHERE c.station_id=#{id} and c.enabled=0 
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by c.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryTotalAvg" parameterType="String" resultType="Map">
+		select COUNT(id) total,TRUNCATE(avg(star),1) avg from zxj_comment WHERE car_id=#{carid}
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.car.model.Comment">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_comment where id=#{id}
+	</select>
+	
+</mapper>

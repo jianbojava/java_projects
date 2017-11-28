@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.ActivationMapper">
+	<sql id="Base_Column_List">
+		id,number,member_id,enabled,create_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.Activation">
+		insert into nlf_activation(id,number,member_id,enabled,create_date)
+		values(#{id},#{number},#{member_id},#{enabled},now())
+	</insert>
+	
+	<delete id="del">
+		delete from nlf_activation where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</delete>
+	
+	<update id="update" parameterType="com.cocosh.nlf.model.Activation">
+		update nlf_activation 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(number)">number=#{number},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(member_id)">member_id=#{member_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+		</set> 
+		where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.Activation">
+		select a.*,u.username,u.name,u.number user_number,d.name depart_name from nlf_activation a
+		      left join sys_user u on a.member_id=u.id
+		      left join sys_depart d on u.depart_id=d.id
+		<where>
+			<if test="keywords!=null and keywords!=''">(u.name like '%${keywords}%' or u.number like '%${keywords}%' or a.number  like '%${keywords}%'  )</if>
+		    <if test="enabled!=null">and a.enabled=#{enabled}</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by a.create_date asc,a.number asc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="checkNumber" parameterType="String" resultType="com.cocosh.nlf.model.Activation">
+		select * from nlf_activation  where number=#{number}
+	</select>
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.Activation">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_activation where id=#{id}
+	</select>
+	
+	<select id="queryByNumber" parameterType="String" resultType="com.cocosh.nlf.model.Activation">
+		select * from nlf_activation where number=#{number} and enabled=0;
+	</select>
+	
+	
+	
+</mapper>

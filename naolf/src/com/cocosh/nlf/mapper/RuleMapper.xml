@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.RuleMapper">
+	<sql id="Base_Column_List">
+		id,name,sn_header,sn_start,sn_middle,sn_end,sort,enabled
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.Rule">
+		insert into nlf_rule(id,name,sn_header,sn_start,sn_middle,sn_end,sort,enabled)
+		values(#{id},#{name},#{sn_header},#{sn_start},#{sn_middle},#{sn_end},#{sort},#{enabled})
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update nlf_rule set enabled=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.nlf.model.Rule">
+		update nlf_rule 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sn_header)">sn_header=#{sn_header},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sn_start)">sn_start=#{sn_start},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sn_middle)">sn_middle=#{sn_middle},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sn_end)">sn_end=#{sn_end},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sort)">sort=#{sort},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+		</set> 
+		 where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.Rule">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_rule 
+		<where>
+			<if test="keywords!=null and keywords!=''">name like '%${keywords}%'</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by sort asc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.Rule">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_rule where id=#{id}
+	</select>
+	
+	<select id="queryAll" resultType="com.cocosh.nlf.model.Rule">
+		select
+		<include refid="Base_Column_List" />
+		from nlf_rule where enabled=0
+	</select>
+	
+	<select id="queryRule" parameterType="com.cocosh.nlf.model.Rule" resultType="com.cocosh.nlf.model.Rule">
+		select
+		<include refid="Base_Column_List" />
+		from nlf_rule where sn_start=#{sn_start} and sn_end=#{sn_end}
+	</select>
+	
+</mapper>

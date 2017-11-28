@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.BrandMapper">
+	<sql id="Base_Column_List">
+		id,name,logo,brief,url,sort,type,enabled
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.car.model.Brand">
+		insert into zxj_brand(id,name,logo,brief,url,sort,type,enabled,create_date,modify_date)
+		values(#{id},#{name},#{logo},#{brief},#{url},#{sort},#{type},0,now(),now())
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update zxj_brand set enabled=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.car.model.Brand">
+		update zxj_brand 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(logo)">logo=#{logo},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(brief)">brief=#{brief},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(url)">url=#{url},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sort)">sort=#{sort},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.Brand">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_brand 
+		<where>
+			<if test="keywords!=null and keywords!=''">name like '%${keywords}%'</if>
+			<if test="type!=null and type!=''">and type=#{type}</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by sort asc,create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.car.model.Brand">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_brand where id=#{id}
+	</select>
+	
+	<select id="queryAllByType" parameterType="String" resultType="com.cocosh.car.model.Brand">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_brand where type=#{type} and enabled=0 order by sort asc,create_date desc  
+	</select>
+	
+</mapper>

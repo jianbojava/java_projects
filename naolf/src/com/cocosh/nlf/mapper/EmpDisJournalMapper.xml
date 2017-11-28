@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.EmpDisJournalMapper">
+	<sql id="Base_Column_List">
+		v.TRANSFER_name,v.depart_name,v.username,v.user_number,v.BKZ_SCORE,v.KZ_SCORE,v.KD_SCORE,v.ORDER_NO,v.pay_amount,v.price,v.buy_name,v.buy_num,v.grade1_refer,v.grade2_refer,v.grade3_refer,v.grade4_refer,v.create_date,
+		s1.dispacth_grade grade1,s2.dispacth_grade grade2,s3.dispacth_grade grade3,s4.dispacth_grade grade4
+	</sql>
+	
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.EmpDisJournal">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_emp_score_journal_v v
+		LEFT JOIN sys_user s1 on (v.grade1_refer = s1.number )
+		LEFT JOIN sys_user s2 on (v.grade2_refer = s2.number )
+		LEFT JOIN sys_user s3 on (v.grade3_refer = s3.number )
+		LEFT JOIN sys_user s4 on (v.grade4_refer = s4.number ) 
+		<where> 1=1
+			<if test="keywords!=null and keywords!=''"> and (v.user_number like '%${keywords}%' or v.username like '%${keywords}%' or order_no like '%${keywords}%') </if>
+			and (user_id = #{operat_id} or user_id in (
+				select su.id from sys_user_depart ud ,sys_user su WHERE ud.user_id = #{operat_id} and ud.depart_id = su.depart_id
+			))
+		</where>
+		order by v.create_date desc
+	</select>
+	
+	<select id="queryListAll" resultType="com.cocosh.nlf.model.EmpDisJournal">
+		select l.*,c.code_desc TRANSFER_name from nlf_emp_score_journal l left join nlf_code_detail c on l.TRANSFER_TYPE=c.code
+		<where>
+			<if test="user_number != null and user_number != ''">and l.user_number=#{user_number}</if>
+			<if test="ORDER_NO != null and ORDER_NO != ''">and l.ORDER_NO=#{ORDER_NO}</if>
+			<if test="KZ_SCORE != null and KZ_SCORE != ''">and l.KZ_SCORE!='0.00'</if>
+			<if test="BKZ_SCORE != null and BKZ_SCORE != ''">and l.BKZ_SCORE!='0.00'</if>
+			<if test="KD_SCORE != null and KD_SCORE != ''">and l.KD_SCORE!='0.00'</if>
+		</where>
+		 order BY create_date DESC
+	</select>
+	
+	<select id="queryDetails" resultType="com.cocosh.nlf.model.EmpDisJournal">
+		select * from nlf_emp_score_journal_v
+		<where>
+			<if test="user_number != null and user_number != ''">and user_number=#{user_number}</if>
+			<if test="ORDER_NO != null and ORDER_NO != ''">and ORDER_NO=#{ORDER_NO}</if>
+			<if test="KZ_SCORE != null and KZ_SCORE != ''">and KZ_SCORE=#{KZ_SCORE}</if>
+			<if test="BKZ_SCORE != null and BKZ_SCORE != ''">and BKZ_SCORE=#{BKZ_SCORE}</if>
+			<if test="KD_SCORE != null and KD_SCORE != ''">and KD_SCORE=#{KD_SCORE}</if>
+		    <if test="TRANSFER_name != null and TRANSFER_name != ''">and TRANSFER_name=#{TRANSFER_name}</if>
+		</where>
+	</select>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.EmpDisJournal">
+		INSERT into nlf_emp_score_journal(user_number,BKZ_SCORE,KZ_SCORE,KD_SCORE,TRANSFER_TYPE,ORDER_NO,CREATE_DATE)
+								VALUES (#{user_number},#{BKZ_SCORE},#{KZ_SCORE},#{KD_SCORE},#{TRANSFER_name},#{ORDER_NO},now())
+	</insert>
+	
+</mapper>

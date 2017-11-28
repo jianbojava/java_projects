@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.EquipmentInfoMapper">
+	<sql id="Base_Column_List">
+		equipmentID,manufacturerID,equipmentModel,productionDate,equipmentType,equipmentLng,equipmentLat,stationID,enabled
+	</sql>
+	
+	<insert id="add" parameterType="java.util.List">
+		insert into zxj_equipmentInfo(equipmentID,manufacturerID,equipmentModel,productionDate,equipmentType,equipmentLng,equipmentLat,stationID,create_date,modify_date,enabled) values 
+		<foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.equipmentID},#{item.manufacturerID},#{item.equipmentModel},#{item.productionDate},#{item.equipmentType},#{item.equipmentLng},#{item.equipmentLat},#{item.stationID},now(),now(),0) 
+	    </foreach>
+	    ON DUPLICATE KEY UPDATE manufacturerID=VALUES(manufacturerID),
+	    equipmentModel=VALUES(equipmentModel),
+	    productionDate=VALUES(productionDate),
+	    equipmentType=VALUES(equipmentType),
+	    equipmentLng=VALUES(equipmentLng),
+	    equipmentLat=VALUES(equipmentLat),
+	    stationID=VALUES(stationID),
+	    modify_date=now()
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update zxj_equipmentInfo set enabled=#{del_flg} where equipmentID in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.car.model.EquipmentInfo">
+		update zxj_equipmentInfo 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(manufacturerID)">manufacturerID=#{manufacturerID},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(equipmentModel)">equipmentModel=#{equipmentModel},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(productionDate)">productionDate=#{productionDate},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(equipmentType)">equipmentType=#{equipmentType},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(equipmentLng)">equipmentLng=#{equipmentLng},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(equipmentLat)">equipmentLat=#{equipmentLat},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(stationID)">stationID=#{stationID},</if>
+		</set> 
+		,modify_date=now() where equipmentID=#{equipmentID}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.EquipmentInfo">
+		select  e.equipmentID,e.manufacturerID,e.equipmentModel,e.productionDate,e.equipmentType,e.equipmentLng,e.equipmentLat,e.enabled,s.stationName
+		from zxj_equipmentInfo e LEFT JOIN zxj_stationinfo s ON e.stationID=s.stationID 
+		<where>
+			<if test="keywords!=null and keywords!=''">(e.equipmentID like '%${keywords}%' or s.stationName like '%${keywords}%')</if>
+		</where>
+		order by e.create_date desc
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.car.model.EquipmentInfo">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_equipmentInfo where equipmentID=#{equipmentID}
+	</select>
+	
+	<select id="queryByStationID" parameterType="String" resultType="com.cocosh.car.model.EquipmentInfo">
+		select equipmentID from zxj_equipmentInfo where stationID=#{stationID} order by create_date desc
+	</select>
+	
+	<delete id="delT">
+		delete from zxj_equipmentInfo where equipmentID in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>;
+		delete from zxj_connectorInfo where equipmentID in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>;
+	</delete>
+	
+</mapper>

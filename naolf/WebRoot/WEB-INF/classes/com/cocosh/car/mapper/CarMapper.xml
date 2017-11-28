@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.CarMapper">
+	<sql id="Base_Column_List">
+		id,number,name,license,type,nature,brand_id,brand_name,model_id,model_name,engine_num,register_addr,register_num,register_date,product_area,exfactory_date,total_distance,battery_distance,charge_length,fuel_distance,fuel_type,tank_vol,body_size,body_weight,body_design,cargo_vol,top_speed,sup_company,sup_person,sup_mobile,sign_date,end_date,IFNULL(price,0.00) price,IFNULL(mkt_price,0.00) mkt_price,IFNULL(deposit,0.00) deposit,gallerys,sort,dot_id,dot_name,park_id,park_name,review,review_error,comment_star,enabled,create_date,modify_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.car.model.Car">
+		insert into zxj_car(id,number,name,license,type,nature,brand_id,brand_name,model_id,model_name,engine_num,register_addr,register_num,register_date,product_area,exfactory_date,total_distance,battery_distance,charge_length,fuel_distance,fuel_type,tank_vol,body_size,body_weight,body_design,cargo_vol,top_speed,sup_company,sup_person,sup_mobile,sign_date,end_date,price,mkt_price,deposit,gallerys,sort,dot_id,dot_name,park_id,park_name,review,review_error,comment_star,enabled,create_date,modify_date)
+		values(#{id},#{number},#{name},#{license},#{type},#{nature},#{brand_id},#{brand_name},#{model_id},#{model_name},#{engine_num},#{register_addr},#{register_num},#{register_date},#{product_area},#{exfactory_date},#{total_distance},#{battery_distance},#{charge_length},#{fuel_distance},#{fuel_type},#{tank_vol},#{body_size},#{body_weight},#{body_design},#{cargo_vol},#{top_speed},#{sup_company},#{sup_person},#{sup_mobile},#{sign_date},#{end_date},#{price},#{mkt_price},#{deposit},#{gallerys},#{sort},#{dot_id},#{dot_name},#{park_id},#{park_name},0,#{review_error},0,0,now(),now())
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_field"/>
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update zxj_car set ${del_field}=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.car.model.Car">
+		update zxj_car 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(number)">number=#{number},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(license)">license=#{license},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(type)">type=#{type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(nature)">nature=#{nature},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(brand_id)">brand_id=#{brand_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(brand_name)">brand_name=#{brand_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(model_id)">model_id=#{model_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(model_name)">model_name=#{model_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(engine_num)">engine_num=#{engine_num},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(register_addr)">register_addr=#{register_addr},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(register_num)">register_num=#{register_num},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(register_date)">register_date=#{register_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(product_area)">product_area=#{product_area},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(exfactory_date)">exfactory_date=#{exfactory_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(total_distance)">total_distance=#{total_distance},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(battery_distance)">battery_distance=#{battery_distance},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(charge_length)">charge_length=#{charge_length},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(fuel_distance)">fuel_distance=#{fuel_distance},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(fuel_type)">fuel_type=#{fuel_type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(tank_vol)">tank_vol=#{tank_vol},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(body_size)">body_size=#{body_size},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(body_weight)">body_weight=#{body_weight},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(body_design)">body_design=#{body_design},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(cargo_vol)">cargo_vol=#{cargo_vol},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(top_speed)">top_speed=#{top_speed},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sup_company)">sup_company=#{sup_company},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sup_person)">sup_person=#{sup_person},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sup_mobile)">sup_mobile=#{sup_mobile},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sign_date)">sign_date=#{sign_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(end_date)">end_date=#{end_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(price)">price=#{price},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(mkt_price)">mkt_price=#{mkt_price},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(deposit)">deposit=#{deposit},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(gallerys)">gallerys=#{gallerys},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sort)">sort=#{sort},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(dot_id)">dot_id=#{dot_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(dot_name)">dot_name=#{dot_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(park_id)">park_id=#{park_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(park_name)">park_name=#{park_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(review)">review=#{review},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(review_error)">review_error=#{review_error},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(comment_star)">comment_star=#{comment_star},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.Car">
+		SELECT c.id,c.number,c.name,c.license,c.brand_name,c.model_name,c.price,c.mkt_price,c.exfactory_date,c.deposit,d.name dot_name,p.name park_name,c.review,c.enabled,c.gallerys,
+		c.total_distance,c.battery_distance,c.charge_length,c.top_speed,c.body_size,c.body_design,c.sup_company,c.sup_person,c.sup_mobile,c.sign_date,c.end_date FROM zxj_car c 
+		LEFT JOIN zxj_dot d ON c.dot_id=d.id LEFT JOIN zxj_parking p ON c.park_id=p.id 
+		where c.del_flg=0 
+		<if test="keywords!=null and keywords!=''">and (c.number=#{keywords} or c.name like '%${keywords}%')</if>
+		<if test="review!=null and review!=''">and c.review=#{review}</if>
+		<if test="enabled!=null and enabled!=''">and c.enabled=#{enabled}</if>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by c.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryDyncPage" parameterType="vo" resultType="com.cocosh.car.model.Car">
+		select c.id,c.number,c.name,c.license,c.brand_id,c.brand_name,c.model_id,c.model_name,c.dot_id,c.dot_name,
+		c.park_id,c.park_name,c.review,c.enabled,u.username dispatch_name,u.mobile dispatch_mobile,IF(o.num>0,1,0) rent_status from zxj_car c 
+		left join zxj_parking p on c.park_id=p.id LEFT JOIN sys_user u ON p.dispatch_id=u.id 
+		LEFT JOIN (select car_id,count(id) num  
+		from zxj_order  
+		where (
+		<if test="startDate!=null">
+			(rent_star_time <![CDATA[<=]]> #{startDate} AND rent_end_time <![CDATA[>=]]> #{startDate}) OR  
+	        (rent_star_time <![CDATA[<=]]> #{endDate} AND rent_end_time <![CDATA[>=]]> #{endDate}) OR  
+	        (rent_star_time <![CDATA[>=]]>  #{startDate} AND rent_end_time <![CDATA[<=]]>  #{endDate})
+		</if>
+		<if test="startDate==null">
+			(rent_end_time <![CDATA[>=]]> now() AND rent_star_time <![CDATA[<=]]> now())  
+		</if>
+         ) AND status<![CDATA[>=]]>0 AND status<![CDATA[<=]]>2 and type=0 and del_flg=0 GROUP BY car_id)o ON c.id=o.car_id 
+         where c.del_flg=0 
+		<if test="keywords!=null and keywords!=''">and (c.number=#{keywords} or c.name like '%${keywords}%')</if>
+		GROUP BY c.id 
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by c.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryPageApp" parameterType="vo" resultType="com.cocosh.car.model.Car">
+		select c.id,c.name,c.battery_distance,c.body_design,IFNULL(TRUNCATE(avg(m.star),1),0) comment_star,
+		c.gallerys,c.license,c.price,c.mkt_price,IF(o.num>0,1,0) rent_status from zxj_car c
+		left join zxj_comment m on c.id=m.car_id 
+		LEFT JOIN (select car_id,count(*) num  
+		from zxj_order  
+		where ((rent_star_time <![CDATA[<=]]> #{startDate} AND rent_end_time <![CDATA[>=]]> #{startDate}) OR  
+        (rent_star_time <![CDATA[<=]]> #{endDate} AND rent_end_time <![CDATA[>=]]> #{endDate}) OR  
+        (rent_star_time <![CDATA[>=]]> #{startDate} AND rent_end_time <![CDATA[<=]]> #{endDate})) AND status<![CDATA[>=]]>0 AND status<![CDATA[<=]]>2 and type=0 and del_flg=0 GROUP BY car_id)o ON c.id=o.car_id
+		WHERE c.review=1 and c.enabled=0 and c.del_flg=0 
+		<if test="keywords!=null and keywords!=''">and (c.number=#{keywords} or name like '%${keywords}%')</if>
+		<if test="dot_id!=null and dot_id!=''">and c.dot_id=#{dot_id}</if>
+		<if test="brand_id!=null and brand_id!=''">and c.brand_id=#{brand_id}</if>
+		GROUP BY c.id 
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+				 ,c.sort asc,c.create_date desc
+			</when>
+			<otherwise>
+				 order by rent_status asc,c.sort asc,c.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryAllNoPage" parameterType="vo" resultType="com.cocosh.car.model.Car">
+		select c.id,c.number,c.name,c.license,IFNULL(c.price,0.00) price,IFNULL(c.mkt_price,0.00) mkt_price,IF(o.num>0,1,0) rent_status from zxj_car c 
+		LEFT JOIN (select car_id,count(*) num  
+		from zxj_order  
+		where ((rent_star_time <![CDATA[<=]]> #{startDate} AND rent_end_time <![CDATA[>=]]> #{startDate}) OR  
+        (rent_star_time <![CDATA[<=]]> #{endDate} AND rent_end_time <![CDATA[>=]]> #{endDate}) OR  
+        (rent_star_time <![CDATA[>=]]> #{startDate} AND rent_end_time <![CDATA[<=]]> #{endDate})) AND status<![CDATA[>=]]>0 AND status<![CDATA[<=]]>2 and type=0 and del_flg=0 GROUP BY car_id)o ON c.id=o.car_id
+		WHERE c.review=1 and c.enabled=0 and c.del_flg=0 
+		<if test="keywords!=null and keywords!=''">and (c.number=#{keywords} or name like '%${keywords}%')</if>
+		<if test="dot_id!=null and dot_id!=''">and c.dot_id=#{dot_id}</if>
+		<if test="brand_id!=null and brand_id!=''">and c.brand_id=#{brand_id}</if>
+		GROUP BY c.id 
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by c.${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+				 ,c.sort asc,c.create_date desc
+			</when>
+			<otherwise>
+				 order by rent_status asc,c.sort asc,c.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.car.model.Car">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_car where id=#{id}
+	</select>
+	
+	<select id="queryByIdAPP" parameterType="vo" resultType="com.cocosh.car.model.Car">
+		select c.id,c.name,c.battery_distance,c.body_design,c.exfactory_date,c.total_distance,c.park_id,
+		c.gallerys,c.license,IFNULL(c.deposit,0.00) deposit,IFNULL(c.price,0.00) price,IFNULL(c.mkt_price,0.00) mkt_price,IF(o.num>0,1,0) rent_status from zxj_car c 
+		LEFT JOIN (select car_id,count(*) num  
+		from zxj_order  
+		where ((rent_star_time <![CDATA[<=]]> #{startDate} AND rent_end_time <![CDATA[>=]]> #{startDate}) OR  
+        (rent_star_time <![CDATA[<=]]> #{endDate} AND rent_end_time <![CDATA[>=]]> #{endDate}) OR  
+        (rent_star_time <![CDATA[>=]]> #{startDate} AND rent_end_time <![CDATA[<=]]> #{endDate})) AND status<![CDATA[>=]]>0 AND status<![CDATA[<=]]>2 and type=0 and del_flg=0 GROUP BY car_id)o ON c.id=o.car_id
+		WHERE c.id=#{id} 
+	</select>
+	
+	<select id="queryAll" resultType="com.cocosh.car.model.Car">
+		select id,number,name,license from zxj_car where review=1 and enabled=0 and del_flg=0 order by sort asc,create_date desc
+	</select>
+	
+</mapper>

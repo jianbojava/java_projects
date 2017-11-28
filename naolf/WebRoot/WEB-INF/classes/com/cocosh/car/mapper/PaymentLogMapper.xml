@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.PaymentLogMapper">
+	<sql id="Base_Column_List">
+		sn,user_id,mem_id,firm_id,descript,order_sn,IFNULL(amount,0.00) amount,channel,pay_type,type,trade_no,pay_status,remark,create_date,modify_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.car.model.PaymentLog">
+		insert into zxj_payment_log(sn,user_id,mem_id,firm_id,descript,order_sn,amount,channel,pay_type,type,trade_no,pay_status,remark,create_date,modify_date)
+		values(#{sn},#{user_id},#{mem_id},#{firm_id},#{descript},#{order_sn},#{amount},#{channel},#{pay_type},#{type},#{trade_no},#{pay_status},#{remark},now(),now())
+	</insert>
+	
+	<update id="update" parameterType="com.cocosh.car.model.PaymentLog">
+		update zxj_payment_log
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(trade_no)">trade_no=#{trade_no},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(pay_status)">pay_status=#{pay_status},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(pay_type)">pay_type=#{pay_type},</if>
+		</set> 
+		,modify_date=now() where sn=#{sn}
+	</update>
+	
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.PaymentLog">
+		select l.sn,u.username user_name,IFNULL(m.name,m.mobile) mem_name,f.name firm_name,l.descript,l.order_sn,IFNULL(l.amount,0.00) amount,
+		l.channel,l.pay_type,l.type,l.trade_no,l.pay_status,l.create_date,l.remark from zxj_payment_log l LEFT JOIN sys_user u ON l.user_id=u.id 
+		LEFT JOIN zxj_member m ON l.mem_id=m.id LEFT JOIN zxj_firm f ON l.firm_id=f.id 
+		<where>
+			<if test="keywords!=null and keywords!=''">(l.sn=#{keywords} or l.order_sn=#{keywords} or m.mobile=#{keywords} or m.name=#{keywords})</if>
+			<if test="type!=null and type!=''">and l.type in (${type})</if>
+			<if test="pay_type!=null and pay_type!=''">and l.pay_type=#{pay_type}</if>
+			<if test="firm_id!=null and firm_id!=''">and l.firm_id=#{firm_id}</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询流水中所有的企业 -->
+	<select id="queryFirmFromPaymentLog" resultType="com.cocosh.member.model.Firm">
+		SELECT f.id,f.name from (SELECT DISTINCT firm_id from zxj_payment_log WHERE firm_id IS NOT NULL)o 
+		LEFT JOIN zxj_firm f ON o.firm_id=f.id 
+	</select>
+	
+	<select id="queryPageApp" parameterType="vo" resultType="com.cocosh.car.model.PaymentLog">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_payment_log 
+		<where>
+			<if test="mem_id!=null and mem_id!=''">mem_id=#{mem_id}</if>
+			<choose>
+				<!-- 保证金 -->
+				<when test="type==0">
+					<choose>
+						<when test="status!=null and status!=''">
+							<!-- 充值-->
+							<if test="status==0">and pay_status=1 and type=1</if>
+							<!-- 退款 -->
+							<if test="status==1">and type=4</if>
+						</when>
+						<otherwise>
+							<!-- 全部 -->
+							and ((pay_status=1 and type=1) or type=4)
+						</otherwise>
+					</choose>
+				</when>
+				<otherwise>
+					<choose>
+						<when test="status!=null and status!=''">
+							<!-- 充值-->
+							<if test="status==0">and pay_status=1 and type=2</if>
+							<!-- 消费 -->
+							<if test="status==1">and type=0</if>
+							<!-- 退款 -->
+							<if test="status==2">and type=3</if>
+						</when>
+						<otherwise>
+							<!-- 全部 -->
+							and ((pay_status=1 and type=2) or type=0 or type=3)
+						</otherwise>
+					</choose>
+				</otherwise>
+			</choose>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryBySn" parameterType="String" resultType="com.cocosh.car.model.PaymentLog">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_payment_log where sn=#{sn}
+	</select>
+	
+	
+	<select id="queryExport" parameterType="vo" resultType="com.cocosh.car.model.PaymentLogExportVo">
+		select l.sn,u.username user_name,IFNULL(m.name,m.mobile) mem_name,f.name firm_name,l.descript,l.order_sn,IFNULL(l.amount,0.00) amount,
+		l.channel,l.pay_type,l.type,l.trade_no,l.pay_status,l.create_date,l.remark from zxj_payment_log l LEFT JOIN sys_user u ON l.user_id=u.id 
+		LEFT JOIN zxj_member m ON l.mem_id=m.id LEFT JOIN zxj_firm f ON l.firm_id=f.id 
+		<where>
+			<if test="keywords!=null and keywords!=''">(l.sn=#{keywords} or m.mobile=#{keywords})</if>
+			<if test="type!=null and type!=''">and l.type=#{type}</if>
+			<if test="pay_type!=null and pay_type!=''">and l.pay_type=#{pay_type}</if>
+			<if test="firm_id!=null and firm_id!=''">and l.firm_id=#{firm_id}</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryPayValid" parameterType="String" resultType="Integer">
+		SELECT count(*) from zxj_payment_log WHERE trade_no=#{trade_no}
+	</select>
+	
+</mapper>

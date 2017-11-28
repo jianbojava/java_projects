@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.UserCashMapper">
+	<sql id="Base_Column_List">
+		uc.id,
+		uc.user_id,
+		uc.kd_score,
+		uc.type,
+		uc.status,
+		uc.apply_date,
+		uc.pay_date,
+		u.`name` username,
+		u.number userno,
+		cd1.code_desc type_desc,
+		cd2.code_desc status_desc
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.UserCash">
+		insert into nlf_usercash(id,user_id,kd_score,type,status,apply_date,pay_date)
+		values(#{id},#{user_id},#{kd_score},#{type},#{status},#{apply_date},#{pay_date})
+	</insert>
+	
+	<delete id="del">
+		delete from nlf_usercash where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</delete>
+	
+	<update id="update" parameterType="com.cocosh.nlf.model.UserCash">
+		update nlf_usercash 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(user_id)">user_id=#{user_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(kd_score)">kd_score=#{kd_score},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(type)">type=#{type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(status)">status=#{status},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(apply_date)">apply_date=#{apply_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(pay_date)">pay_date=#{pay_date},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.UserCash">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_usercash uc,
+			sys_user u,
+			nlf_code_detail cd1,
+			nlf_code_detail cd2 
+		<where>
+			uc.user_id = u.id and uc.type = cd1.`code`
+			and cd1.parent_code='CASHTYPE'
+			and uc.status = cd2.`code`
+			and cd2.parent_code = 'CASHSTATUS'
+			<if test="keywords!=null and keywords!=''"> and (uc.id = '${keywords}' or u.name like  '%${keywords}%' or u.number like  '%${keywords}%')</if>
+			<if test="status!=null and status!=''"> and uc.status=${status} </if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by apply_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="WithdrawalsId" parameterType="String" resultType="String">
+		select max(r.id) from nlf_usercash r where r.id like #{id}
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.UserCash">
+		select * from nlf_usercash where id=#{id}
+	</select>
+	
+	<select id="queryWapAll" parameterType="String" resultType="com.cocosh.nlf.model.UserCash">
+		select * from nlf_usercash 
+		<where>
+			<if test="user_id != null and user_id != ''"> user_id = #{user_id}</if>
+		</where>
+		order by apply_date desc 
+	</select>
+	
+	
+	<select id="pay" parameterType="String" resultType="String">
+		select 
+		nlf_usercash_pay_fn(#{id})
+		from dual
+	</select>
+</mapper>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.CourseMapper">
+	<sql id="Base_Column_List">
+		nlf_course.id,nlf_course.depart_id,nlf_course.lesson_id,nlf_course.start_time,nlf_course.teacher,nlf_course.type,nlf_course.end_time,nlf_course.status,nlf_course.num,nlf_course.enabled,nlf_course.create_date,nlf_course.modify_date,nlf_course.description,nlf_lesson.name l_name,sys_depart.name d_name
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.Course">
+		insert into nlf_course(id,type,depart_id,lesson_id,start_time,status,num,enabled,teacher,end_time,description,create_date,modify_date)
+		values(#{id},#{type},#{depart_id},#{lesson_id},#{start_time},#{status},#{num},#{enabled},#{teacher},#{end_time},#{description},now(),now())
+	</insert>
+	
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_field"/>
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update nlf_course set ${del_field}=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.nlf.model.Course">
+		update nlf_course 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(depart_id)">depart_id=#{depart_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(lesson_id)">lesson_id=#{lesson_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(start_time)">start_time=#{start_time},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(end_time)">end_time=#{end_time},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(status)">status=#{status},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(num)">num=#{num},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(teacher)">teacher=#{teacher},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(type)">type=#{type},</if>
+		    <if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(description)">description=#{description},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.Course">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_course left join nlf_lesson on nlf_course.lesson_id=nlf_lesson.id
+		left join sys_depart on nlf_course.depart_id=sys_depart.id
+		<where>
+			<if test="keywords!=null and keywords!=''">nlf_lesson.name like '%${keywords}%'</if>
+			<if test="startDate2!=null and startDate2!=''">and nlf_course.start_time <![CDATA[>=]]> #{startDate2}</if>
+			<if test="endDate2!=null and endDate2!=''">and nlf_course.start_time <![CDATA[<=]]> #{endDate2}</if>
+			<if test="depart_id!=null and depart_id!=''">and nlf_course.depart_id=#{depart_id}</if>
+			<if test="status!=null">and nlf_course.status=#{status}</if>
+			<if test="enabled!=null">and nlf_course.enabled=#{enabled}</if>
+			and depart_id in (select ud.depart_id from sys_user_depart ud where ud.user_id = #{operat_id} 
+				UNION
+				select u.depart_id from sys_user u where u.id = #{operat_id})
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.Course">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_course left join nlf_lesson on nlf_course.lesson_id=nlf_lesson.id
+		left join sys_depart on nlf_course.depart_id=sys_depart.id
+		where nlf_course.id=#{id}
+	</select>
+	
+	<select id="queryByString" parameterType="String" resultType="com.cocosh.nlf.model.Course">
+		select * from nlf_course 
+		<where>
+			<if test="lesson_id!=null and lesson_id!=''">and lesson_id=#{lesson_id}</if>
+		</where>
+	</select>
+	<select id="queryWapList" parameterType="com.cocosh.nlf.model.Course" resultType="com.cocosh.nlf.model.Course">
+	select c.*,d.province_name,d.city_name,d.region_name,d.address,d.name d_name
+	from nlf_course c left join sys_depart d on c.depart_id=d.id  
+		<where>
+			<if test="status!=null">and c.status=#{status}</if>
+			<if test="lesson_id!=null and lesson_id!=''">and c.lesson_id=#{lesson_id}</if>
+			<if test="id!=null and id!=''">and c.id=#{id}</if>
+			<if test="type!=null">and c.type=#{type}</if>
+			<if test="depart_id!=null and depart_id!=''">and c.depart_id=#{depart_id}</if>
+			<if test="province_id!=null and province_id!=''">and d.province_id=#{province_id}</if>
+			<if test="city_id!=null and city_id!=''">and d.city_id=#{city_id}</if>
+		</where>
+	</select>
+</mapper>

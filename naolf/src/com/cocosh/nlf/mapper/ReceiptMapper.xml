@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.ReceiptMapper">
+	<sql id="Base_Column_List">
+		id,norder_id,type,money,content,add_date,create_date,sn,title,code,isreturn
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.Receipt">
+		insert into nlf_receipt(id,title,code,norder_id,type,isreturn,money,content,add_date,create_date,sn)
+		values(#{id},#{title},#{code},#{norder_id},#{type},#{isreturn},#{money},#{content},#{add_date},now(),#{sn})
+	</insert>
+	
+	<delete id="del">
+		delete from nlf_receipt where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</delete>
+	
+	<update id="update" parameterType="com.cocosh.nlf.model.Receipt">
+		update nlf_receipt 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(order_id)">norder_id=#{norder_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(title)">title=#{title},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(code)">code=#{code},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(type)">type=#{type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(isreturn)">isreturn=#{isreturn},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(money)">money=#{money},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(content)">content=#{content},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(add_date)">code=#{add_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sn)">sn=#{sn},</if>
+		</set> 
+		 where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.Receipt">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_receipt 
+		<where>
+			<if test="keywords!=null and keywords!=''">name like '%${keywords}%'</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.Receipt">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_receipt where id=#{id}
+	</select>
+	
+	<select id="queryByOrderId" parameterType="String" resultType="com.cocosh.nlf.model.Receipt">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_receipt where norder_id=#{norder_id}
+	</select>
+	
+</mapper>

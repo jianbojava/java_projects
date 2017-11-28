@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.RechargeMapper">
+	<sql id="Base_Column_List">
+		id,user_id,reason,operate_id,create_date,recharge_type,refer_id,reason_type
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.Recharge">
+		insert into nlf_recharge(id,user_id,reason,operate_id,create_date,recharge_type,refer_id,reason_type)
+		values(#{id},#{user_id},#{reason},#{operate_id},now(),#{recharge_type},#{refer_id},#{reason_type})
+	</insert>
+	
+	<delete id="del">
+		delete from nlf_recharge where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</delete>
+	
+	<update id="update" parameterType="com.cocosh.nlf.model.Recharge">
+		update nlf_recharge 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(user_id)">user_id=#{user_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(reason)">reason=#{reason},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(operate_id)">operate_id=#{operate_id},</if>
+		</set> 
+		 where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.Recharge">
+		SELECT
+			r.*, s. NAME refer_cname,
+			s.number refer_number,
+			cd2.code_desc reason_type_desc,
+			CASE
+				WHEN r.recharge_type = 1 THEN
+					'积分'
+				WHEN t.type = 0 THEN
+					'卡'
+				ELSE
+					'券'
+			END charge_category,
+			ut.sn ticket_no,
+			esj.KZ_SCORE KZscore,
+			esj.KD_SCORE KDscore,
+			u.`name` cname,
+			u.number user_number,
+			d.`name` depart_name,
+			cd.code_desc user_type
+		FROM
+			nlf_recharge r
+		LEFT JOIN sys_user s ON r.refer_id = s.id
+		LEFT JOIN nlf_user_ticket ut ON (r.id = ut.recharge_id and ut.type = 1)
+		LEFT JOIN nlf_ticket t on (t.id = ut.conn_id)
+		LEFT JOIN nlf_code_detail cd2 ON (
+			r.reason_type = cd2. CODE
+			AND cd2.parent_code = 'CHARGE_REASON_TYPE'
+		)
+		LEFT JOIN nlf_emp_score_journal esj ON (esj.ORDER_NO = r.id)
+		LEFT JOIN sys_user u on(r.user_id = u.id)
+		LEFT JOIN sys_depart d ON(u.depart_id = d.id)
+		LEFT JOIN nlf_code_detail cd ON(cd.parent_code = 'USER_TYPE' AND cd.`code` = u.user_type )
+		<where> 1=1 
+			<if test="user_id!=null and user_id!=''"> and r.user_id =#{user_id}</if>
+			and (
+			r.user_id = #{operat_id} or r.user_id in (
+					select u.id from sys_user u ,sys_user_depart ud where u.depart_id =  ud.depart_id
+					 and ud.user_id= #{operat_id} 
+				)
+			)
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by r.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="querySumPage" parameterType="vo" resultType="com.cocosh.nlf.model.Recharge">
+		select * from(SELECT
+			user_id,
+			u.name cname,
+			u.number user_number,
+			cd.code_desc user_type,
+			d.name depart_name
+		FROM
+			(
+				SELECT DISTINCT
+					user_id
+				FROM
+					nlf_recharge
+			) n,
+			sys_user u,
+			nlf_code_detail cd,
+			sys_depart d
+		where
+			n.user_id = u.id
+		AND cd.parent_code = 'USER_TYPE'
+		AND cd.`code` = u.user_type
+		and u.depart_id = d.id) a
+		<where>
+			<if test="keywords!=null and keywords!=''"> (cname like '%${keywords}%' or user_number like '%${keywords}%' )</if>
+		</where>
+	</select>
+	
+	<select id="queryAll" resultType="com.cocosh.nlf.model.Recharge">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_recharge order by create_date desc
+	</select>
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.Recharge">
+		SELECT
+			r.id , r.user_id,
+			r.reason,
+			r.operate_id,
+			r.create_date,
+			r.recharge_type,
+			r.refer_id,
+			r.reason_type,
+			cd2.code_desc reason_type_desc,
+			s.number refer_number,
+			s.NAME refer_cname,
+			j.KZ_SCORE KZscore,
+			j.KD_SCORE KDscore
+		FROM
+			nlf_recharge r
+		LEFT JOIN nlf_code_detail cd2 ON (
+			r.reason_type = cd2. CODE
+			AND cd2.parent_code = 'CHARGE_REASON_TYPE'
+		)
+		LEFT JOIN sys_user s ON r.refer_id = s.id
+		LEFT JOIN nlf_emp_score_journal j ON (r.id = j.ORDER_NO AND j.TRANSFER_TYPE = 'SRC')
+		where  r.id=#{id}
+	</select>
+	
+	<select id="generatId" parameterType="String" resultType="String">
+		select max(r.id) from nlf_recharge r where r.id like #{id}
+	</select>
+	
+</mapper>

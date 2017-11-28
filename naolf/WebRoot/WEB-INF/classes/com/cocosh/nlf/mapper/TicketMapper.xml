@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.TicketMapper">
+	<sql id="Base_Column_List">
+		id,type,name,rule_id,notice,use_rule,lesson_ids,image,price,create_date,modify_date,enabled
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.Ticket">
+		insert into nlf_ticket(id,type,name,rule_id,notice,use_rule,lesson_ids,image,price,create_date,modify_date,enabled)
+	values(#{id},#{type},#{name},#{rule_id},#{notice},#{use_rule},#{lesson_ids},#{image},#{price},now(),now(),#{enabled})
+	</insert>
+	
+	<delete id="del">
+		delete from nlf_ticket where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</delete>
+	
+	<update id="update" parameterType="com.cocosh.nlf.model.Ticket">
+		update nlf_ticket 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(type)">type=#{type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(rule_id)">rule_id=#{rule_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(notice)">notice=#{notice},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(use_rule)">use_rule=#{use_rule},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(lesson_ids)">lesson_ids=#{lesson_ids},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(image)">image=#{image},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(price)">price=#{price},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.Ticket">
+		select n.id,n.type,n.name,n.rule_id,n.notice,n.use_rule,n.lesson_ids,n.image,n.price,n.create_date,n.modify_date,n.enabled,
+		CONCAT(r.sn_header,r.sn_start,r.sn_middle,r.sn_end) rule_sn from nlf_ticket n left join nlf_rule r on n.rule_id= r.id
+		<where>
+			<if test="keywords!=null and keywords!=''">n.name like '%${keywords}%'</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by n.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.Ticket">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_ticket where id=#{id}
+	</select>
+	
+	<select id="queryAll" resultType="com.cocosh.nlf.model.Ticket">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_ticket order by create_date desc
+	</select>
+	<select id="queryAllReset" resultType="com.cocosh.nlf.model.Ticket">
+		select n.id,n.type,n.name,n.rule_id,n.notice,n.use_rule,n.lesson_ids,n.image,n.price,n.create_date,n.modify_date,n.enabled,CONCAT(r.sn_header,r.sn_start,r.sn_middle,r.sn_end) rule_sn 
+		from nlf_ticket n left join nlf_rule r on n.rule_id= r.id where n.enabled='0'
+	</select>
+	
+	<select id="checkName" resultType="com.cocosh.nlf.model.Ticket">
+		select * from nlf_ticket 
+		<where>
+		<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name}</if>
+		</where>
+	</select>
+	
+	<select id="queryByType" resultType="com.cocosh.nlf.model.Ticket" parameterType="com.cocosh.nlf.model.Ticket">
+		select <include refid="Base_Column_List" /> from nlf_ticket
+		<where>
+			<if test="type!=null">type=#{type}</if>
+		</where>
+		 order by create_date desc
+	</select>
+	<select id="queryByutSn" resultType="com.cocosh.nlf.model.Ticket">
+	      select t.id,t.type,t.name,t.rule_id,t.notice,t.use_rule,t.lesson_ids,t.image,t.price,t.create_date,t.modify_date,t.enabled
+	    from nlf_ticket t left join nlf_user_ticket  ut on t.id=ut.conn_id where ut.sn=#{ut_sn};
+	</select>
+	
+</mapper>

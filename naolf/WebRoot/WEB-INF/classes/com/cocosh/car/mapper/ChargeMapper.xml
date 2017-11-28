@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.ChargeMapper">
+	<sql id="Base_Column_List">
+		id,number,name,brand_id,brand_name,dot_id,dot_name,park_id,park_name,comment_star,gallerys,price,mkt_price,support_car,charge_type,enabled,create_date,modify_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.car.model.Charge">
+		insert into zxj_charge(id,number,name,brand_id,brand_name,dot_id,dot_name,park_id,park_name,comment_star,gallerys,price,mkt_price,support_car,charge_type,enabled,create_date,modify_date)
+		values(#{id},#{number},#{name},#{brand_id},#{brand_name},#{dot_id},#{dot_name},#{park_id},#{park_name},#{comment_star},#{gallerys},#{price},#{mkt_price},#{support_car},#{charge_type},0,now(),now())
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update zxj_charge set enabled=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.car.model.Charge">
+		update zxj_charge 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(number)">number=#{number},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(brand_id)">brand_id=#{brand_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(brand_name)">brand_name=#{brand_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(dot_id)">dot_id=#{dot_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(dot_name)">dot_name=#{dot_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(park_id)">park_id=#{park_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(park_name)">park_name=#{park_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(comment_star)">comment_star=#{comment_star},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(gallerys)">gallerys=#{gallerys},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(price)">price=#{price},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(mkt_price)">mkt_price=#{mkt_price},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(support_car)">support_car=#{support_car},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(charge_type)">charge_type=#{charge_type},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.Charge">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_charge 
+		<where>
+			<if test="keywords!=null and keywords!=''">name like '%${keywords}%'</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by #{orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">#{orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.car.model.Charge">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_charge where id=#{id}
+	</select>
+	
+</mapper>

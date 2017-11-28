@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.IllegalMapper">
+	<sql id="Base_Column_List">
+		illegalSeq,vin,illegal_date,document_number,place,illegal_content,illegal_code,service_amount,payment,payment_status,illegal_amount,penalty_point,status,orderSeq,illegal_imageUrl,certificate_image,create_date,is_solve,remark
+	</sql>
+	
+	<insert id="add" parameterType="java.util.List">
+		INSERT IGNORE INTO zxj_illegal(illegalSeq,vin,illegal_date,document_number,place,illegal_content,illegal_code,service_amount,payment,payment_status,illegal_amount,penalty_point,status,orderSeq,illegal_imageUrl,certificate_image,create_date) values
+		<foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.illegalSeq},#{item.vin},#{item.illegal_date},#{item.document_number},#{item.place},#{item.illegal_content},#{item.illegal_code},#{item.service_amount},#{item.payment},#{item.payment_status},#{item.illegal_amount},#{item.penalty_point},#{item.status},#{item.orderSeq},#{item.illegal_imageUrl},#{item.certificate_image},#{item.create_date})
+	    </foreach>
+	</insert>
+	
+	<update id="update" parameterType="com.cocosh.car.model.Illegal">
+		update zxj_illegal set is_solve=1,remark=#{remark} 
+		where illegalSeq in 
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.Illegal">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_illegal 
+		<where>
+			<if test="keywords!=null and keywords!=''">orderSeq like '%${keywords}%'</if>
+			<if test="startDate2!=null and startDate2!=''">and illegal_date <![CDATA[>=]]> #{startDate2}</if>
+			<if test="endDate2!=null and endDate2!=''">and illegal_date <![CDATA[<=]]> #{endDate2}</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<select id="queryExport" parameterType="vo" resultType="com.cocosh.car.model.IllegalExport">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_illegal 
+		<where>
+			<if test="keywords!=null and keywords!=''">orderSeq like '%${keywords}%'</if>
+			<if test="startDate2!=null and startDate2!=''">and illegal_date <![CDATA[>=]]> #{startDate2}</if>
+			<if test="endDate2!=null and endDate2!=''">and illegal_date <![CDATA[<=]]> #{endDate2}</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+</mapper>

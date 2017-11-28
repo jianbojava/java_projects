@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.UserTicketMapper">
+	<sql id="Base_Column_List">
+	  id,line_sn,type,used,user_id,sn,create_sn,conn_id,rule_id,norder_id,used_id,recharge_id,status,upgrade,used_date,create_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.UserTicket">
+		insert into nlf_user_ticket(id,line_sn,type,used,user_id,sn,create_sn,conn_id,rule_id,norder_id,used_id,recharge_id,status,upgrade,used_date,create_date)
+		values(#{id},#{line_sn},#{type},#{used},#{user_id},#{sn},#{create_sn},#{conn_id},#{rule_id},#{norder_id},#{used_id},#{recharge_id},#{status},#{upgrade},#{used_date},now())
+	</insert>
+	
+	<delete id="del">
+		delete from nlf_user_ticket where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</delete>
+	
+	<update id="update" parameterType="com.cocosh.nlf.model.UserTicket">
+		update nlf_user_ticket 
+		<set>
+		    <if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(type)">type=#{type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(used)">used=#{used},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(user_id)">user_id=#{user_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sn)">sn=#{sn},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(create_sn)">create_sn=#{create_sn},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(conn_id)">conn_id=#{conn_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(rule_id)">rule_id=#{rule_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(norder_id)">norder_id=#{norder_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(used_id)">used_id=#{used_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(recharge_id)">recharge_id=#{recharge_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(used_date)">used_date=#{used_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(line_sn)">line_sn=#{line_sn},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(status)">status=#{status},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(upgrade)">upgrade=#{upgrade},</if>
+		</set> 
+		 where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.UserTicket">
+		select ut.id,ut.type,ut.used,ut.user_id,ut.sn,ut.create_sn,ut.conn_id,ut.rule_id,ut.norder_id,ut.used_id,
+		      ut.used_date,ut.line_sn,ut.recharge_id,ut.create_date,ut.status,ut.upgrade,
+		      u.number,t.name,t.type ticket_type, user.number used_number ,user.name user_name
+		from nlf_user_ticket ut left join sys_user u on ut.user_id=u.id
+		                        left join nlf_ticket t on ut.conn_id=t.id
+		                        left join sys_user user on ut.used_id=user.id
+		<where> 1=1 
+			<if test="keywords!=null and keywords!=''">and (ut.sn like '%${keywords}%' or u.number like '%${keywords}%' or user.number like '%${keywords}%')</if>
+			<if test="conn_id!=null and conn_id!=''">and ut.conn_id=#{conn_id}</if>
+			<if test="type!=null and type!=''">and ut.type=#{type}</if>
+			<if test="ticket_type!=null">and t.type=#{ticket_type}</if>
+			<if test="used!=null">and ut.used=#{used}</if>
+			<if test="recharge_id!=null and recharge_id!=''">and ut.recharge_id=#{recharge_id}</if>
+			
+			and (user_id =  #{operat_id} or user_id in (
+				SELECT su.id from sys_user_depart ud ,sys_user su where ud.user_id = #{operat_id} and ud.depart_id = su.depart_id
+				))
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by ut.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.UserTicket">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_user_ticket where id=#{id}
+	</select>
+	
+	<select id="queryAll" resultType="com.cocosh.nlf.model.UserTicket">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_user_ticket 
+	</select>
+	
+	<select id="queryUticket" parameterType="com.cocosh.nlf.model.UserTicket" resultType="com.cocosh.nlf.model.UserTicket">
+		select ut.id,ut.type,ut.used,ut.user_id,ut.sn,ut.create_sn,ut.conn_id,ut.rule_id,ut.norder_id,ut.used_id,ut.used_date,ut.create_date,ut.status,ut.upgrade
+		   from nlf_user_ticket ut
+		  left join sys_user u on ut.user_id=u.id
+		  <where>
+			<if test="user_id!=null and user_id!=''">ut.user_id=#{user_id}</if>
+			<if test="used!=null">and ut.used=#{used}</if>
+			<if test="conn_id!=null and conn_id!=''">and ut.conn_id=#{conn_id}</if>
+			<if test="type!=null">and ut.type=#{type}</if>
+			<if test="number!=null and number!=''">and u.number=#{number}</if>
+			<if test="norder_id!=null and norder_id!=''">and ut.norder_id=#{norder_id}</if>
+		</where>
+	</select>
+	<!-- 通过规则查询最大编号 -->
+	<select id="queryMaxCreateSn" resultType="Integer" parameterType="String">
+		SELECT IFNULL(MAX(create_sn),0) from nlf_user_ticket where rule_id=#{rule_id}
+	</select>
+	
+	<select id="queryBySn" parameterType="String" resultType="com.cocosh.nlf.model.UserTicket">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_user_ticket where sn=#{sn}
+	</select>
+	<!-- 查询课程或卡券 -->
+	<select id="query" parameterType="com.cocosh.nlf.model.UserTicket" resultType="com.cocosh.nlf.model.UserTicket">
+		select ut.*,l.name,ifnull(l.price,0.0) price from nlf_user_ticket ut 
+		     <if test="type==0">left join nlf_lesson l on ut.conn_id=l.id</if>
+		     <if test="type==1">left join nlf_ticket l on ut.conn_id=l.id</if>
+		<where>
+	       <if test="norder_id!=null and norder_id!=''">ut.norder_id=#{norder_id}</if>
+	       <if test="type!=null">and ut.type=#{type}</if>
+		</where>
+	</select>
+	<!-- 集中课程批量结业 -->
+	<update id="updateToEnd" >
+		update nlf_user_ticket set status=4 where status=3 and type=0 and id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	<!-- 集中课程批量取消 -->
+	<update id="updateToCancel" >
+		update nlf_user_ticket set status=2 where (status=1 or status=-3) and type=0 and id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<!-- 集中课程批量审核通过变成未训练 -->
+	<update id="updateToNoStudy" >
+		update nlf_user_ticket set status=-3 where status=1 and type=0 and id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<!-- 去退款 -->
+	<update id="updateToReturn" >
+		update nlf_user_ticket set status=2 where <![CDATA[ status<4]]> and type=0 and norder_id=#{norder_id}
+	</update>
+	
+	<!-- 查询课程 -->
+	<select id="queryLessonByNorderId" parameterType="String" resultType="com.cocosh.nlf.model.UserTicket">
+		select ut.*,l.name,l.image,l.catname,l.type lesson_type from nlf_user_ticket ut left join nlf_lesson l on ut.conn_id=l.id
+		 where ut.norder_id=#{norder_id} and ut.type=0 order by l.name
+	</select>
+	
+	<select id="queryByNorderIdAndConnId" parameterType="String" resultType="com.cocosh.nlf.model.UserTicket">
+		select ut.*,l.train left_review,l.type lesson_type from nlf_user_ticket ut left join nlf_lesson l on ut.conn_id=l.id
+		 where ut.norder_id=#{norder_id}  and ut.conn_id=#{conn_id}  and ut.type=0
+	</select>
+	
+	<!-- 查询会员的卡券 -->
+	<select id="queryUticketByUserId" resultType="com.cocosh.nlf.model.UserTicket">
+		select ut.id,ut.type,ut.used,ut.user_id,ut.sn,ut.create_sn,ut.conn_id,ut.rule_id,ut.norder_id,ut.used_id,ut.used_date,ut.create_date,ut.status,ut.upgrade,t.name
+		   from nlf_user_ticket ut
+		  left join nlf_ticket t on ut.conn_id=t.id
+		  where ut.type=1 and (ut.user_id=#{user_id} or ut.used_id=#{user_id}) order by ut.create_date desc
+	</select>
+	
+	<!-- 已使用的金卡查询升级券 （查询未使用的和本人使用但未升级）-->
+	<select id="queryUsedCanUpgrade" parameterType="com.cocosh.nlf.model.UserTicket" resultType="com.cocosh.nlf.model.UserTicket">
+		select ut.id,ut.type,ut.used,ut.user_id,ut.sn,ut.create_sn,ut.conn_id,ut.rule_id,ut.norder_id,ut.used_id,ut.used_date,ut.create_date,ut.status,ut.upgrade,t.name,t.image
+		   from nlf_user_ticket ut
+		  left join nlf_ticket t on ut.conn_id=t.id
+		  where ut.type=1 and ut.upgrade=0 and ut.conn_id=#{conn_id} and ((ut.user_id=#{user_id} and ut.used=0) or (ut.used_id=#{user_id} and ut.used=1)) order by ut.create_date desc
+	</select>
+	
+	
+	
+</mapper>

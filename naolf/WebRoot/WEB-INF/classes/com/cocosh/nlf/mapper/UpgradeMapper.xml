@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.UpgradeMapper">
+	<sql id="Base_Column_List">
+		id,user_ticket_id1,user_ticket_id2,user_ticket_id3,create_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.Upgrade">
+		insert into nlf_upgrade(id,user_ticket_id1,user_ticket_id2,user_ticket_id3,create_date)
+		values(#{id},#{user_ticket_id1},#{user_ticket_id2},#{user_ticket_id3},now())
+	</insert>
+	
+	<delete id="del">
+		delete from nlf_upgrade where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</delete>
+	
+	<update id="update" parameterType="com.cocosh.nlf.model.Upgrade">
+		update nlf_upgrade 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(user_ticket_id1)">user_ticket_id1=#{user_ticket_id1},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(user_ticket_id2)">user_ticket_id2=#{user_ticket_id2},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(user_ticket_id3)">user_ticket_id3=#{user_ticket_id3},</if>
+		</set> 
+		 where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.Upgrade">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_upgrade 
+		<where>
+			<if test="keywords!=null and keywords!=''">name like '%${keywords}%'</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.Upgrade">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_upgrade where id=#{id}
+	</select>
+	
+	<select id="queryByutid123" parameterType="String" resultType="com.cocosh.nlf.model.Upgrade">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_upgrade where user_ticket_id1=#{user_ticket_id3} or user_ticket_id2=#{user_ticket_id3} or user_ticket_id3=#{user_ticket_id3}  
+	</select>
+	
+</mapper>

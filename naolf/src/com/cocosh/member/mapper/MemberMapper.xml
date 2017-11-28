@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.member.mapper.MemberMapper">
+	<sql id="Base_Column_List">
+		id,mobile,name,IFNULL(deposit,0.00) deposit,IFNULL(account,0.00) account,IFNULL(point,0) point,point_lv,card_no,card_front,card_back,driver_no,driver_scan,driver_scan_back,ship_addr,head_img,type,number,card_number,IFNULL(evcard_status,0) evcard_status,old_card_number,review,review_error,remark,firm_id,firm_name,sale_id,sale_name,credential,pay_pwd,enabled,create_date,modify_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.member.model.Member">
+		insert into zxj_member(id,mobile,name,deposit,account,point,point_lv,card_no,card_front,card_back,driver_no,driver_scan,driver_scan_back,ship_addr,head_img,type,number,card_number,review_error,remark,review,firm_id,firm_name,sale_id,sale_name,credential,enabled,create_date,modify_date)
+		values(#{id},#{mobile},#{name},#{deposit},#{account},#{point},#{point_lv},#{card_no},#{card_front},#{card_back},#{driver_no},#{driver_scan},#{driver_scan_back},#{ship_addr},#{head_img},#{type},#{number},#{card_number},#{review_error},#{remark},0,#{firm_id},#{firm_name},#{sale_id},#{sale_name},#{credential},0,now(),now())
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_field"/>
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update zxj_member set ${del_field}=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.member.model.Member">
+		update zxj_member 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(mobile)">mobile=#{mobile},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(deposit)">deposit=#{deposit},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(account)">account=#{account},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(point)">point=#{point},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(point_lv)">point_lv=#{point_lv},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(card_no)">card_no=#{card_no},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(card_front)">card_front=#{card_front},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(card_back)">card_back=#{card_back},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(driver_no)">driver_no=#{driver_no},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(driver_scan)">driver_scan=#{driver_scan},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(ship_addr)">ship_addr=#{ship_addr},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(head_img)">head_img=#{head_img},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(type)">type=#{type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(number)">number=#{number},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(card_number)">card_number=#{card_number},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(review)">review=#{review},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(review_error)">review_error=#{review_error},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(pay_pwd)">pay_pwd=#{pay_pwd},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(remark)">remark=#{remark},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(firm_id)">firm_id=#{firm_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(firm_name)">firm_name=#{firm_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sale_id)">sale_id=#{sale_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sale_name)">sale_name=#{sale_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(credential)">credential=#{credential},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(evcard_status)">evcard_status=#{evcard_status},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(driver_scan_back)">driver_scan_back=#{driver_scan_back},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.member.model.Member">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_member where del_flg=0 
+		<if test="user_id!=null and user_id!=''">
+			and firm_id IN (SELECT DISTINCT id from zxj_firm WHERE sale_id=#{user_id}) 
+		</if>
+	    <if test="type!=null and type!=''">and type=#{type}</if>
+	    <if test="firm_id!=null and firm_id!=''">and firm_id=#{firm_id}</if>
+	    <if test="review!=null and review!=''">and review=#{review}</if>
+	    <if test="enabled!=null and enabled!=''">and enabled=#{enabled}</if>
+		<if test="keywords!=null and keywords!=''"> and (mobile like '%${keywords}%' or name like '%${keywords}%')</if>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.member.model.Member">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_member where id=#{id} and del_flg=0
+	</select>
+	
+	<!-- 退款使用  、取消订单    否则找不到用户  无法退款 -->
+	<select id="queryByIdRefund" parameterType="String" resultType="com.cocosh.member.model.Member">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_member where id=#{id}
+	</select>
+	
+	<select id="queryByMobile" parameterType="String" resultType="com.cocosh.member.model.Member">
+		select id,head_img,mobile,name,type,card_number,card_no,firm_id,type,IFNULL(deposit,0.00) deposit,IFNULL(account,0.00) account,review,enabled from zxj_member where mobile=#{mobile} and del_flg=0
+	</select>
+	
+	<!-- Excel导入，手机号校验 -->
+	<select id="queryCountByMobile" parameterType="String" resultType="Integer">
+		select count(id) from zxj_member where mobile=#{mobile} and del_flg=0 
+	</select>
+	
+	<select id="queryByCredential" parameterType="String" resultType="com.cocosh.member.model.Member">
+		select id,name,head_img,review,enabled,IFNULL(deposit,0.00) deposit,IFNULL(account,0.00) account,pay_pwd,type,firm_id,mobile,card_no,driver_no,driver_scan,ship_addr,card_number from zxj_member where credential=#{credential} and del_flg=0
+	</select>
+	
+	<!-- 下单扣钱 -->
+	<update id="updateAccount" parameterType="com.cocosh.member.model.Member">
+		update zxj_member set account=#{account} where id=#{id} 
+	</update>
+	
+	<!-- 充值保证金 -->
+	<update id="updateDeposit" parameterType="com.cocosh.member.model.Member">
+		update zxj_member set deposit=#{deposit} where id=#{id} 
+	</update>
+	
+	<!-- 查询用户中所有的企业 -->
+	<select id="queryFirmFromMem" parameterType="vo" resultType="com.cocosh.member.model.Firm">
+		SELECT f.id,f.name from (SELECT DISTINCT firm_id from zxj_member WHERE firm_id IS NOT NULL and del_flg=0)o 
+		LEFT JOIN zxj_firm f ON o.firm_id=f.id 
+		<where>
+			<if test="user_id!=null and user_id!=''">
+				f.id IN (SELECT DISTINCT id from zxj_firm WHERE sale_id=#{user_id}) 
+			</if>
+		</where>
+	</select>
+	
+	<!-- 批量插入（Excel导入） -->
+	<insert id="addExcelImport" parameterType="java.util.List">
+		insert into zxj_member(id,mobile,name,point_lv,card_no,driver_no,ship_addr,type,number,card_number,remark,review,firm_id,firm_name,enabled,create_date,modify_date) values 
+	    <foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.id},#{item.mobile},#{item.name},#{item.point_lv},#{item.card_no},#{item.driver_no},#{item.ship_addr},1,#{item.number},#{item.card_number},#{item.remark},0,#{item.firm_id},#{item.firm_name},0,now(),now())  
+	    </foreach>
+	</insert>
+	
+	<!-- 普通会员Excel导出 -->
+	<select id="queryExport" parameterType="vo" resultType="com.cocosh.member.model.MemberExportVo">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_member where del_flg=0 
+	    <if test="type!=null and type!=''">and type=#{type}</if>
+	    <if test="review!=null and review!=''">and review=#{review}</if>
+	    <if test="enabled!=null and enabled!=''">and enabled=#{enabled}</if>
+		<if test="keywords!=null and keywords!=''"> and (mobile like '%${keywords}%' or name like '%${keywords}%')</if>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryAll" resultType="com.cocosh.member.model.Member">
+		select id,number,name,card_number,mobile from zxj_member where review=1 and enabled=0 and del_flg=0 order by create_date desc 
+	</select>
+	
+	<select id="queryByIds" resultType="com.cocosh.member.model.Member">
+		select id,name,mobile,card_no,driver_scan,ship_addr,card_number,old_card_number from zxj_member where del_flg=0 and id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</select>
+	
+	<update id="updateOldCard" parameterType="String">
+		update zxj_member set old_card_number=card_number where mobile=#{mobile} and del_flg=0 
+	</update>
+</mapper>

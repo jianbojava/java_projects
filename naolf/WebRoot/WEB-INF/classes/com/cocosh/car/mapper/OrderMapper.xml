@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.OrderMapper">
+	<sql id="Base_Column_List">
+		id,sn,mem_id,firm_id,status,pay_status,car_id,ready_date,delivery_date,rent_star_time,rent_star_ttime,rent_end_time,rent_end_ttime,IFNULL(unit_price,0.00) unit_price,IFNULL(car_price,0.00) car_price,IFNULL(amount,0.00) amount,IFNULL(pay_amount,0.00) pay_amount,IFNULL(coupon_amount,0.00) coupon_amount,pay_type,IFNULL(insurance,0.00) insurance,ins_num,coupon_id,use_point,get_dot_id,return_dot_id,IFNULL(get_amount,0.00) get_amount,IFNULL(return_amount,0.00) return_amount,get_type,return_type,get_address,return_address,get_lng,get_lat,return_lng,return_lat,remark,IFNULL(damage_amount,0.00) damage_amount,IFNULL(peccancy_amount,0.00) peccancy_amount,IFNULL(other_amount,0.00) other_amount,IFNULL(sale_amount,0.00) sale_amount,return_gallerys,damage_gallerys,order_remark,create_date,complete_date,settle_date,type
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.car.model.Order">
+		insert into zxj_order(id,sn,mem_id,firm_id,status,pay_status,car_id,ready_date,delivery_date,rent_star_time,rent_star_ttime,rent_end_time,rent_end_ttime,unit_price,car_price,amount,pay_amount,coupon_amount,pay_type,insurance,ins_num,coupon_id,use_point,get_dot_id,return_dot_id,get_amount,return_amount,get_type,return_type,get_address,return_address,get_lng,get_lat,return_lng,return_lat,remark,damage_amount,peccancy_amount,other_amount,sale_amount,return_gallerys,damage_gallerys,order_remark,create_date,modify_date,complete_date,settle_date,order_json,type)
+		values(#{id},#{sn},#{mem_id},#{firm_id},#{status},#{pay_status},#{car_id},#{ready_date},#{delivery_date},#{rent_star_time},#{rent_star_time},#{rent_end_time},#{rent_end_time},#{unit_price},#{car_price},#{amount},#{pay_amount},#{coupon_amount},#{pay_type},#{insurance},#{ins_num},#{coupon_id},#{use_point},#{get_dot_id},#{return_dot_id},#{get_amount},#{return_amount},#{get_type},#{return_type},#{get_address},#{return_address},#{get_lng},#{get_lat},#{return_lng},#{return_lat},#{remark},#{damage_amount},#{peccancy_amount},#{other_amount},#{sale_amount},#{return_gallerys},#{damage_gallerys},#{order_remark},now(),now(),#{complete_date},#{settle_date},#{order_json},#{type})
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_field"/>
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update zxj_order set ${del_field}=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.car.model.Order">
+		update zxj_order 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(mem_id)">mem_id=#{mem_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(firm_id)">firm_id=#{firm_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(status)">status=#{status},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(pay_status)">pay_status=#{pay_status},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(car_id)">car_id=#{car_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(ready_date)">ready_date=#{ready_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(delivery_date)">delivery_date=#{delivery_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(rent_star_time)">rent_star_time=#{rent_star_time},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(rent_star_ttime)">rent_star_ttime=#{rent_star_ttime},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(rent_end_time)">rent_end_time=#{rent_end_time},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(rent_end_ttime)">rent_end_ttime=#{rent_end_ttime},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(unit_price)">unit_price=#{unit_price},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(car_price)">car_price=#{car_price},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(amount)">amount=#{amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(pay_amount)">pay_amount=#{pay_amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(coupon_amount)">coupon_amount=#{coupon_amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(pay_type)">pay_type=#{pay_type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(insurance)">insurance=#{insurance},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(ins_num)">ins_num=#{ins_num},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(coupon_id)">coupon_id=#{coupon_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(use_point)">use_point=#{use_point},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(get_dot_id)">get_dot_id=#{get_dot_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(return_dot_id)">return_dot_id=#{return_dot_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(get_amount)">get_amount=#{get_amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(return_amount)">return_amount=#{return_amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(get_type)">get_type=#{get_type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(return_type)">return_type=#{return_type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(get_address)">get_address=#{get_address},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(return_address)">return_address=#{return_address},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(get_lng)">get_lng=#{get_lng},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(get_lat)">get_lat=#{get_lat},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(return_lng)">return_lng=#{return_lng},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(return_lat)">return_lat=#{return_lat},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(remark)">remark=#{remark},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(damage_amount)">damage_amount=#{damage_amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(peccancy_amount)">peccancy_amount=#{peccancy_amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(other_amount)">other_amount=#{other_amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sale_amount)">sale_amount=#{sale_amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(return_gallerys)">return_gallerys=#{return_gallerys},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(damage_gallerys)">damage_gallerys=#{damage_gallerys},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(order_remark)">order_remark=#{order_remark},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(complete_date)">complete_date=#{complete_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(settle_date)">settle_date=#{settle_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(order_json)">order_json=#{order_json},</if>
+		</set> 
+		,modify_date=now() 
+		<where>
+			<choose>
+				<when test="id!=null and id!=''">id=#{id}</when>
+				<otherwise>sn=#{sn}</otherwise>
+			</choose>
+		</where>
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.Order">
+		SELECT o.id,o.sn,o.status,IFNULL(o.amount,0.00) amount,o.pay_type,o.create_date,m.name mem_name,m.mobile mem_mobile,
+		f.name firm_name,u.username dispatch_name,u.mobile dispatch_mobile,o.remark,o.car_id,o.get_dot_id,o.return_dot_id,o.rent_star_time,o.rent_end_time,o.pay_status    
+		from zxj_order o LEFT JOIN zxj_car c ON o.car_id=c.id 
+		LEFT JOIN zxj_parking p ON c.park_id=p.id LEFT JOIN zxj_firm f ON o.firm_id=f.id 
+		LEFT JOIN zxj_member m ON o.mem_id=m.id LEFT JOIN sys_user u ON p.dispatch_id=u.id 
+		where o.del_flg=0 
+		<if test="user_id!=null and user_id!=''">
+			and o.firm_id IN (SELECT DISTINCT id from zxj_firm WHERE sale_id=#{user_id}) 
+		</if>
+		<if test="keywords!=null and keywords!=''">and (o.sn=#{keywords} or m.mobile=#{keywords})</if>
+		<if test="firm_id!=null and firm_id!=''">and o.firm_id=#{firm_id}</if>
+		<if test="dispatch_id!=null and dispatch_id!=''">and u.id=#{dispatch_id}</if>
+		<if test="status!=null and status!=''">and o.status=#{status}</if>
+		<if test="is_read!=null and is_read!=''">and o.is_read=#{is_read}</if>
+		<if test="type!=null and type!=''">and o.type=#{type}</if>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by o.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryDyncPage" parameterType="vo" resultType="com.cocosh.car.model.Order">
+		SELECT o.id,o.sn,o.status,IFNULL(o.amount,0.00) amount,o.remark,o.rent_star_time,o.rent_end_time,o.create_date,
+		m.name mem_name,m.mobile mem_mobile 
+		from zxj_order o LEFT JOIN zxj_firm f ON o.firm_id=f.id LEFT JOIN zxj_member m ON o.mem_id=m.id 
+		where o.car_id=#{id} and o.del_flg=0 
+		<if test="keywords!=null and keywords!=''">and o.sn=#{keywords}</if>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by o.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryPageApp" parameterType="vo" resultType="com.cocosh.car.model.Order">
+		select o.id,o.sn,o.status,o.type,o.pay_status,o.car_id,o.ready_date,o.rent_star_time,o.rent_end_time,o.create_date,
+		c.name car_name,c.license car_license from zxj_order o left join zxj_car c on o.car_id=c.id 
+		where o.mem_id=#{mem_id} and o.del_flg=0 
+		<if test="status!=null and status!=''">
+			<!-- 未完成 -->
+			<if test="status==0">and ((o.status<![CDATA[>=]]>0 and o.status<![CDATA[<]]>3) or (o.status<![CDATA[>=]]>3 and o.pay_status=0))</if>
+			<!-- 已完成 -->
+			<if test="status==1">and o.status<![CDATA[>=]]>3 and o.status<![CDATA[<=]]>6 and o.pay_status=1</if>
+		</if>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by o.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryByIdApp" parameterType="String" resultType="com.cocosh.car.model.Order">
+		select o.id,o.sn,o.status,o.type,o.ready_date,o.pay_status,IFNULL(o.unit_price,0.00) unit_price,IFNULL(o.car_price,0.00) car_price,IFNULL(o.amount,0.00) amount,IFNULL(o.coupon_amount,0.00) coupon_amount,IFNULL(o.use_point,0) use_point,IFNULL(o.insurance,0.00) insurance,IFNULL(o.ins_num,0) ins_num,IFNULL(o.get_amount,0.00) get_amount,IFNULL(o.return_amount,0.00) return_amount,IFNULL(o.peccancy_amount,0.00) peccancy_amount,IFNULL(o.other_amount,0.00) other_amount,IFNULL(o.sale_amount,0.00) sale_amount,IFNULL(damage_amount,0.00) damage_amount,o.rent_star_time,o.rent_end_time,o.create_date,o.ready_date,delivery_date,complete_date,o.pay_type,o.remark,o.car_id,
+		c.name car_name,c.license car_license,o.get_dot_id,o.return_dot_id,o.get_type,o.return_type,o.get_address,o.return_address,u.username dispatch_name,u.mobile dispatch_mobile from zxj_order o left join zxj_car c on o.car_id=c.id LEFT JOIN zxj_parking p ON c.park_id=p.id LEFT JOIN sys_user u ON p.dispatch_id=u.id where o.id=#{id}
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.car.model.Order">
+		SELECT o.id,o.sn,o.mem_id,o.status,o.pay_status,IFNULL(o.amount,0.00) amount,IFNULL(o.unit_price,0.00) unit_price,IFNULL(o.car_price,0.00) car_price,
+		IFNULL(o.pay_amount,0.00) pay_amount,IFNULL(o.coupon_amount,0.00) coupon_amount,IFNULL(o.insurance,0.00) insurance,o.ins_num,
+		IFNULL(o.get_amount,0.00) get_amount,IFNULL(o.return_amount,0.00) return_amount,IFNULL(o.damage_amount,0.00) damage_amount,IFNULL(o.sale_amount,0.00) sale_amount,
+		IFNULL(o.peccancy_amount,0.00) peccancy_amount,IFNULL(o.other_amount,0.00) other_amount,IFNULL(o.use_point,0) use_point,o.get_type,o.return_type,o.get_dot_id,o.return_dot_id,
+		o.get_address,o.return_address,o.get_lng,o.get_lat,o.return_lng,o.return_lat,o.order_remark,o.return_gallerys,o.damage_gallerys,
+		o.pay_type,o.create_date,o.ready_date,o.delivery_date,o.complete_date,o.type,o.car_id,c.number car_number,c.name car_name,c.license car_license,
+		u.username dispatch_name,u.mobile dispatch_mobile,p.name park_name,p.longitude park_lng,p.latitude park_lat,f.name firm_name,o.remark,o.rent_star_time,o.rent_star_ttime,o.rent_end_time,o.rent_end_ttime 
+		from zxj_order o LEFT JOIN zxj_car c ON o.car_id=c.id LEFT JOIN zxj_parking p ON c.park_id=p.id LEFT JOIN sys_user u ON p.dispatch_id=u.id 
+		LEFT JOIN zxj_firm f ON o.firm_id=f.id where o.id=#{id}
+	</select>
+	
+	<select id="queryAmount" parameterType="String" resultType="com.cocosh.car.model.Order">
+		select id,sn,mem_id,firm_id,status,pay_status,type,car_id,IFNULL(amount,0.00) amount,IFNULL(unit_price,0.00) unit_price,IFNULL(car_price,0.00) car_price,IFNULL(coupon_amount,0.00) coupon_amount,IFNULL(use_point,0) use_point,rent_star_time,rent_end_time,get_type,get_address, 
+		IFNULL(insurance,0.00) insurance,IFNULL(ins_num,0) ins_num,IFNULL(get_amount,0.00) get_amount,IFNULL(return_amount,0.00) return_amount,IFNULL(damage_amount,0.00) damage_amount,IFNULL(sale_amount,0.00) sale_amount,
+		IFNULL(peccancy_amount,0.00) peccancy_amount,IFNULL(other_amount,0.00) other_amount 
+		from zxj_order where id=#{id}
+	</select>
+	
+	<!-- 查找某辆车是否存在时间交集的订单 -->
+	<select id="queryValidDate" parameterType="com.cocosh.car.model.Order" resultType="com.cocosh.car.model.Order">
+		select rent_star_time,rent_end_time from zxj_order  
+		where ((rent_star_time <![CDATA[<=]]> #{rent_star_time} AND rent_end_time <![CDATA[>=]]> #{rent_star_time}) OR  
+        (rent_star_time <![CDATA[<=]]> #{rent_end_time} AND rent_end_time <![CDATA[>=]]> #{rent_end_time}) OR  
+        (rent_star_time <![CDATA[>=]]> #{rent_star_time} AND rent_end_time <![CDATA[<=]]> #{rent_end_time})) AND 
+        status<![CDATA[>=]]>0 AND status<![CDATA[<=]]>2 AND type=0 AND 
+        car_id=#{car_id} and del_flg=0 
+        <if test="id!=null and id!=''">AND id<![CDATA[<>]]>#{id}</if> 
+        LIMIT 0,1
+	</select>
+	
+	<!-- 查找某用户是否存在时间交集的订单  日租订单 -->
+	<select id="queryValidDateM" parameterType="com.cocosh.car.model.Order" resultType="com.cocosh.car.model.Order">
+		select rent_star_time,rent_end_time from zxj_order  
+		where ((((rent_star_time <![CDATA[<=]]> #{rent_star_time} AND rent_end_time <![CDATA[>=]]> #{rent_star_time}) OR  
+        (rent_star_time <![CDATA[<=]]> #{rent_end_time} AND rent_end_time <![CDATA[>=]]> #{rent_end_time}) OR  
+        (rent_star_time <![CDATA[>=]]> #{rent_star_time} AND rent_end_time <![CDATA[<=]]> #{rent_end_time})) AND 
+        status<![CDATA[>=]]>0 AND status<![CDATA[<=]]>2) or (pay_status=0 and status<![CDATA[<>]]>-1)) AND type=0 AND 
+        mem_id=#{mem_id} and del_flg=0 
+        <!-- 延后、推迟使用 -->
+        <if test="id!=null and id!=''">and id<![CDATA[<>]]>#{id}</if>
+        LIMIT 0,1
+	</select>
+	
+	<!-- 修改订单为已读 -->
+	<update id="updateIsRead" parameterType="String">
+		update zxj_order set is_read=1 where id=#{id}
+	</update>
+	<!-- 查询未读订单数 -->
+	<select id="queryNoReadCount" resultType="Integer" parameterType="Integer">
+		select count(id) from zxj_order where is_read=0 and del_flg=0 and type=#{type}
+	</select>
+	
+	<!-- 订单导出 -->
+	<select id="queryExport" parameterType="vo" resultType="com.cocosh.car.model.OrderExportVo">
+		SELECT o.id,o.sn,o.status,IFNULL(o.amount,0.00) amount,IFNULL(o.unit_price,0.00) unit_price,IFNULL(o.car_price,0.00) car_price,
+		IFNULL(o.pay_amount,0.00) pay_amount,IFNULL(o.coupon_amount,0.00) coupon_amount,IFNULL(o.use_point,0) use_point,IFNULL(o.insurance,0.00) insurance,IFNULL(o.ins_num,0) ins_num,
+		IFNULL(o.get_amount,0.00) get_amount,IFNULL(o.return_amount,0.00) return_amount,IFNULL(o.damage_amount,0.00) damage_amount,
+		IFNULL(o.peccancy_amount,0.00) peccancy_amount,IFNULL(o.other_amount,0.00) other_amount,IFNULL(o.sale_amount,0.00) sale_amount,o.get_type,o.return_type,o.get_address,o.return_address,
+		o.pay_type,o.create_date,o.ready_date,o.delivery_date,c.number car_number,c.name car_name,c.license car_license,m.number mem_number,m.card_number mem_card,m.name mem_name,
+		m.mobile mem_mobile,m.type mem_type,u.username dispatch_name,u.mobile dispatch_mobile,f.name firm_name,o.remark,o.order_remark,o.rent_star_ttime,o.rent_end_ttime,o.rent_star_time,o.rent_end_time,p.name park_name,d1.name get_dot_name,d2.name return_dot_name 
+		from zxj_order o LEFT JOIN zxj_car c ON o.car_id=c.id LEFT JOIN zxj_parking p ON c.park_id=p.id 
+		LEFT JOIN zxj_firm f ON o.firm_id=f.id LEFT JOIN zxj_member m ON o.mem_id=m.id 
+		LEFT JOIN sys_user u ON p.dispatch_id=u.id LEFT JOIN zxj_dot d1 ON o.get_dot_id=d1.id LEFT JOIN zxj_dot d2 ON o.return_dot_id=d2.id 
+		where o.del_flg=0 
+		<if test="user_id!=null and user_id!=''">
+			and o.firm_id IN (SELECT DISTINCT id from zxj_firm WHERE sale_id=#{user_id}) 
+		</if>
+		<if test="keywords!=null and keywords!=''">and (o.sn=#{keywords} or m.name like '%${keywords}%')</if>
+		<if test="status!=null and status!=''">and o.status=#{status}</if>
+		<if test="type!=null and type!=''">and o.type=#{type}</if>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by o.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryTimeExport" parameterType="vo" resultType="com.cocosh.car.model.TimeOrderExportVo">
+		SELECT o.id,o.sn,o.status,IFNULL(o.amount,0.00) amount,IFNULL(o.car_price,0.00) car_price,
+		IFNULL(o.pay_amount,0.00) pay_amount,IFNULL(o.coupon_amount,0.00) coupon_amount,IFNULL(o.use_point,0) use_point,
+		IFNULL(o.damage_amount,0.00) damage_amount,IFNULL(o.peccancy_amount,0.00) peccancy_amount,IFNULL(o.other_amount,0.00) other_amount,IFNULL(o.sale_amount,0.00) sale_amount,
+		o.pay_type,o.car_id,m.number mem_number,m.card_number mem_card,m.name mem_name,
+		m.mobile mem_mobile,m.type mem_type,f.name firm_name,o.order_remark,o.rent_star_time,o.rent_end_time 
+		from zxj_order o LEFT JOIN zxj_firm f ON o.firm_id=f.id LEFT JOIN zxj_member m ON o.mem_id=m.id 
+		where o.del_flg=0 
+		<if test="user_id!=null and user_id!=''">
+			and o.firm_id IN (SELECT DISTINCT id from zxj_firm WHERE sale_id=#{user_id}) 
+		</if>
+		<if test="keywords!=null and keywords!=''">and (o.sn=#{keywords} or m.name like '%${keywords}%')</if>
+		<if test="status!=null and status!=''">and o.status=#{status}</if>
+		<if test="type!=null and type!=''">and o.type=#{type}</if>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by o.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询订单中所有的企业 -->
+	<select id="queryFirmFromOrder" parameterType="vo" resultType="com.cocosh.member.model.Firm">
+		SELECT f.id,f.name from (SELECT DISTINCT firm_id from zxj_order WHERE firm_id IS NOT NULL and del_flg=0 and type=#{type})o 
+		LEFT JOIN zxj_firm f ON o.firm_id=f.id 
+		<where>
+			<if test="user_id!=null and user_id!=''">
+				f.id IN (SELECT DISTINCT id from zxj_firm WHERE sale_id=#{user_id}) 
+			</if>
+		</where>
+	</select>
+	<!-- 查询订单中所有的调度员 -->
+	<select id="queryDispFromOrder" parameterType="vo" resultType="com.cocosh.sys.model.User">
+		SELECT DISTINCT u.id,u.username from (SELECT DISTINCT car_id from zxj_order where del_flg=0 and type=#{type})o LEFT JOIN 
+		zxj_car c ON o.car_id=c.id LEFT JOIN zxj_parking p ON c.park_id=p.id LEFT JOIN sys_user u ON p.dispatch_id=u.id 
+	</select>
+	<!-- 根据车辆ID查找调度员手机号 -->
+	<select id="queryDispByCid" resultType="com.cocosh.car.model.Car" parameterType="String">
+		SELECT c.dot_name,c.park_name,c.name,c.license,u.mobile dispatch_mobile from zxj_car c 
+		LEFT JOIN zxj_parking p ON c.park_id=p.id 
+		LEFT JOIN sys_user u ON p.dispatch_id=u.id where c.id=#{id}
+	</select>
+	
+	<!-- 日租订单备车发送短信 提前24小时 -->
+	<select id="queryDispByOid0" resultType="com.cocosh.car.model.Order">
+		select u.mobile dispatch_mobile,m.name mem_name,m.mobile mem_mobile,c.name car_name,c.license car_license,d.name dot_name,p.name park_name,o.id,o.rent_star_time,o.get_type,o.get_address,o.remark 
+		from zxj_order o LEFT JOIN zxj_car c ON o.car_id=c.id LEFT JOIN zxj_member m ON o.mem_id=m.id 
+		LEFT JOIN zxj_parking p ON c.park_id=p.id LEFT JOIN zxj_dot d ON c.dot_id=d.id LEFT JOIN 
+		sys_user u ON p.dispatch_id=u.id 
+		where now()<![CDATA[>=]]> date_add(o.rent_star_time,interval -1440 minute) AND o.is_sms_0=0 and o.type=0 and o.pay_status=1 and o.del_flg=0 ORDER BY o.rent_star_time ASC
+	</select>
+	<update id="updateIsSms0" parameterType="String">
+		update zxj_order set is_sms_0=1 where id=#{id}
+	</update>
+	
+	<!-- 日租订单还车发送短信 提前30分钟 -->
+	<select id="queryDispByOid1" resultType="com.cocosh.car.model.Order">
+		select u.mobile dispatch_mobile,m.name mem_name,m.mobile mem_mobile,c.name car_name,c.license car_license,d.name dot_name,p.name park_name,o.id,o.rent_end_time,o.return_type,o.return_address,o.remark 
+		from zxj_order o LEFT JOIN zxj_car c ON o.car_id=c.id LEFT JOIN zxj_member m ON o.mem_id=m.id 
+		LEFT JOIN zxj_parking p ON c.park_id=p.id LEFT JOIN zxj_dot d ON c.dot_id=d.id LEFT JOIN 
+		sys_user u ON p.dispatch_id=u.id 
+		where now()<![CDATA[>=]]> date_add(o.rent_end_time,interval -30 minute) AND o.is_sms_1=0 and o.type=0 and o.pay_status=1 and o.del_flg=0 ORDER BY o.rent_end_time ASC
+	</select>
+	<update id="updateIsSms1" parameterType="String">
+		update zxj_order set is_sms_1=1 where id=#{id}
+	</update>
+	
+	<!-- 日租订单过时未取车提醒 超过20分钟 -->
+	<select id="queryDispByOid2" resultType="com.cocosh.car.model.Order">
+		select u.mobile dispatch_mobile,m.name mem_name,m.mobile mem_mobile,c.name car_name,c.license car_license,d.name dot_name,p.name park_name,o.id,o.rent_star_time,o.get_type,o.get_address,o.remark 
+		from zxj_order o LEFT JOIN zxj_car c ON o.car_id=c.id LEFT JOIN zxj_member m ON o.mem_id=m.id 
+		LEFT JOIN zxj_parking p ON c.park_id=p.id LEFT JOIN zxj_dot d ON c.dot_id=d.id LEFT JOIN 
+		sys_user u ON p.dispatch_id=u.id 
+		where now()<![CDATA[>=]]> date_add(o.rent_star_time,interval 20 minute) AND o.is_sms_2=0 and o.type=0 and o.pay_status=1 and o.del_flg=0 ORDER BY o.rent_star_time ASC
+	</select>
+	<update id="updateIsSms2" parameterType="String">
+		update zxj_order set is_sms_2=1 where id=#{id}
+	</update>
+	
+	<!-- 未支付订单超过30分钟 自动取消 -->
+	<select id="queryCancelOrder" resultType="String">
+		select id from zxj_order where status=0 and pay_status=0 and type=0 and now()<![CDATA[>=]]> date_add(create_date,interval 30 minute) 
+	</select>
+	<update id="cancelOrder" parameterType="String">
+		update zxj_order set status=-1 where id= #{id}
+	</update>
+	
+	<!-- 通过订单SN查找订单 -->
+	<select id="queryCountBySn" parameterType="String" resultType="Integer">
+		SELECT COUNT(id) from zxj_order WHERE sn=#{sn} and del_flg=0 
+	</select>
+	
+	<!-- 查找订单基本信息 -->
+	<select id="queryBaseBySn" parameterType="String" resultType="com.cocosh.car.model.Order">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_order where sn=#{sn}
+	</select>
+	
+	<!-- 查找企业全部进行中订单的保证金 -->
+	<select id="queryTotalDeposit" parameterType="String" resultType="Double">
+		SELECT IFNULL(SUM(c.deposit),0.00) from zxj_order o LEFT JOIN zxj_car c ON o.car_id=c.id WHERE o.status<![CDATA[>=]]>0 AND o.status<![CDATA[<]]>2 AND o.type=0 AND o.del_flg=0 AND o.firm_id=#{firm_id}
+	</select>
+</mapper>

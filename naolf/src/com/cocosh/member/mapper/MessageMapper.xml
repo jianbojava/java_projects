@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.member.mapper.MessageMapper">
+	
+	<insert id="add" parameterType="com.cocosh.member.model.Message">
+		insert into zxj_message(id,mem_id,title,image,content,create_date)
+		values(#{id},#{mem_id},#{title},#{image},#{content},now())
+	</insert>
+	
+	<!-- 已读 -->
+	<parameterMap type="Map" id="statusParms">
+		<parameter property="msg_id"/>
+		<parameter property="mem_id"/>
+	</parameterMap>
+	<insert id="updateRead" parameterMap="statusParms">
+		insert into zxj_message_status values(#{msg_id},#{mem_id},1,0) 
+		on duplicate key update is_read = 1,del_flg=del_flg
+	</insert>
+	<!-- 删除 -->
+	<insert id="updateDel" parameterMap="statusParms">
+		insert into zxj_message_status values(#{msg_id},#{mem_id},0,1) 
+		on duplicate key update is_read =is_read,del_flg=1
+	</insert>
+	
+	<select id="queryPageApp" parameterType="vo" resultType="com.cocosh.member.model.Message">
+		SELECT m.id,m.mem_id,m.title,m.image,m.content,m.create_date FROM zxj_message m WHERE (m.mem_id=#{mem_id} OR m.mem_id IS NULL) 
+		AND m.id NOT in(SELECT msg_id FROM zxj_message_status WHERE mem_id=#{mem_id} AND del_flg=1) ORDER BY m.create_date DESC
+	</select>
+	<select id="queryWapAll" parameterType="vo" resultType="com.cocosh.member.model.Message">
+		SELECT * FROM zxj_message where mem_id=#{mem_id} ORDER BY create_date DESC;
+	</select>
+	
+	<select id="queryNoReadCount" parameterType="String" resultType="Integer">
+		SELECT COUNT(m.id) FROM zxj_message m WHERE (m.mem_id=#{mem_id} OR m.mem_id IS NULL) 
+		AND m.id NOT in(SELECT msg_id FROM zxj_message_status WHERE mem_id=#{mem_id})
+	</select>
+	
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.CouponMapper">
+	<sql id="Base_Column_List">
+		id,name,amount,full_amount,expired_days,expired_date,decription,enabled,create_date,modify_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.car.model.Coupon">
+		insert into zxj_coupon(id,name,amount,full_amount,expired_days,expired_date,decription,enabled,create_date,modify_date)
+		values(#{id},#{name},#{amount},#{full_amount},#{expired_days},#{expired_date},#{decription},#{enabled},now(),now())
+	</insert>
+	
+	<delete id="del">
+		delete from zxj_coupon where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</delete>
+	
+	<update id="update" parameterType="com.cocosh.car.model.Coupon">
+		update zxj_coupon 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(amount)">amount=#{amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(full_amount)">full_amount=#{full_amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(expired_days)">expired_days=#{expired_days},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(expired_date)">expired_date=#{expired_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(decription)">decription=#{decription},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.Coupon">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_coupon 
+		<where>
+			<if test="keywords!=null and keywords!=''">name like '%${keywords}%'</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by #{orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">#{orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.car.model.Coupon">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_coupon where id=#{id}
+	</select>
+	
+</mapper>

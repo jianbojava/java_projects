@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.ParkingMapper">
+	<sql id="Base_Column_List">
+		id,number,name,longitude,latitude,address,dot_id,dot_name,dispatch_id,dispatch_name,sign_date,end_date,price,mkt_price,enabled
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.car.model.Parking">
+		insert into zxj_parking(id,number,name,longitude,latitude,address,dot_id,dot_name,dispatch_id,dispatch_name,sign_date,end_date,price,mkt_price,enabled)
+		values(#{id},#{number},#{name},#{longitude},#{latitude},#{address},#{dot_id},#{dot_name},#{dispatch_id},#{dispatch_name},#{sign_date},#{end_date},#{price},#{mkt_price},0)
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update zxj_parking set enabled=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.car.model.Parking">
+		update zxj_parking 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(number)">number=#{number},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(longitude)">longitude=#{longitude},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(latitude)">latitude=#{latitude},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(address)">address=#{address},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(dot_id)">dot_id=#{dot_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(dot_name)">dot_name=#{dot_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(dispatch_id)">dispatch_id=#{dispatch_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(dispatch_name)">dispatch_name=#{dispatch_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sign_date)">sign_date=#{sign_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(end_date)">end_date=#{end_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(price)">price=#{price},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(mkt_price)">mkt_price=#{mkt_price},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.Parking">
+		select p.id,p.number,p.name,p.address,p.dot_name,p.sign_date,p.end_date,u.username dispatch_name,p.enabled 
+		from zxj_parking p LEFT JOIN sys_user u ON p.dispatch_id=u.id
+		<where>
+			<if test="keywords!=null and keywords!=''">(p.number=#{keywords} or p.name like '%${keywords}%')</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by #{orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">#{orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by p.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.car.model.Parking">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_parking where id=#{id}
+	</select>
+	
+	<select id="queryAll" resultType="com.cocosh.car.model.Parking">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_parking where enabled=0
+	</select>
+	
+	<select id="queryByDotId" parameterType="String" resultType="com.cocosh.car.model.Parking">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_parking where enabled=0 and dot_id=#{dot_id}
+	</select>
+	
+	<select id="queryDistanceByVo" parameterType="vo" resultType="com.cocosh.car.model.Parking">
+		SELECT id,name,address,ROUND(6378.137*2*ASIN(SQRT(POW(SIN((#{latitude}*PI()/180-latitude*PI()/180)/2),2)+
+		COS(#{latitude}*PI()/180)*COS(latitude*PI()/180)*POW(SIN((#{longitude}*PI()/180-longitude*PI()/180)/2),2))),2) as distances 
+		from zxj_parking WHERE id=#{park_id}
+	</select>
+	
+</mapper>

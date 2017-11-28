@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.NorderMapper">
+	<sql id="Base_Column_List">
+		id,user_id,sn,name,refer_number,number,ticket_sn,status,type,price,pay_amount,depart_id,mobile,conn_id,pay_type,addtype,buy_type,create_date,modify_date,kz_score,kd_score,upnorder,uptype,uputicket
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.Norder">
+		insert into nlf_norder(id,user_id,sn,name,refer_number,number,ticket_sn,status,type,price,pay_amount,depart_id,mobile,conn_id,pay_type,addtype,buy_type,create_date,modify_date,kz_score,kd_score,upnorder,uptype,uputicket)
+		values(#{id},#{user_id},#{sn},#{name},#{refer_number},#{number},#{ticket_sn},#{status},#{type},#{price},#{pay_amount},#{depart_id},#{mobile},#{conn_id},#{pay_type},#{addtype},#{buy_type},#{create_date},now(),#{kz_score},#{kd_score},#{upnorder},#{uptype},#{uputicket})
+	</insert>
+	
+	<delete id="del">
+		delete from nlf_norder where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</delete>
+	
+	<update id="update" parameterType="com.cocosh.nlf.model.Norder">
+		update nlf_norder 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(user_id)">user_id=#{user_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sn)">sn=#{sn},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(refer_number)">refer_number=#{refer_number},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(number)">number=#{number},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(ticket_sn)">ticket_sn=#{ticket_sn},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(status)">status=#{status},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(type)">type=#{type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(price)">price=#{price},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(pay_amount)">pay_amount=#{pay_amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(depart_id)">depart_id=#{depart_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(mobile)">mobile=#{mobile},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(conn_id)">conn_id=#{conn_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(pay_type)">pay_type=#{pay_type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(addtype)">addtype=#{addtype},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(buy_type)">buy_type=#{buy_type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(kz_score)">kz_score=#{kz_score},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(upnorder)">upnorder=#{upnorder},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(uptype)">uptype=#{uptype},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(uputicket)">uputicket=#{uputicket},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.Norder">
+		select o.* ,d.name depart_name from nlf_norder o left join sys_depart d on o.depart_id=d.id
+		<where> 1=1 
+			<if test="keywords!=null and keywords!=''">and (o.name like '%${keywords}%' or o.sn like '%${keywords}%' or o.ticket_sn like '%${keywords}%' or o.number like '%${keywords}%' or o.refer_number like '%${keywords}%')</if>
+		   	<if test="startDate2!=null and startDate2!=''">and o.create_date <![CDATA[>=]]> #{startDate2}</if>
+			<if test="endDate2!=null and endDate2!=''">and o.create_date <![CDATA[<=]]> #{endDate2}</if>
+		   	<if test="type!=null and type!=''">and o.type=#{type}</if>
+		    <if test="depart_id!=null and depart_id!=''">and o.depart_id=#{depart_id}</if>
+		   	<if test="status!=null">and o.status=#{status}</if>
+		   	and (o.user_id = #{operat_id} or o.user_id in(
+				 select u.id from sys_user_depart ud ,sys_user u where ud.user_id = #{operat_id} and ud.depart_id = u.depart_id
+				))
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by o.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.Norder">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_norder where id=#{id}
+	</select>
+	<select id="queryByAll" parameterType="com.cocosh.nlf.model.Norder" resultType="com.cocosh.nlf.model.Norder">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_norder 
+		<where>
+			<if test="id!=null and id!=''">and id=#{id}</if>
+		   	<if test="user_id!=null and user_id!=''">and user_id=#{user_id}</if>
+		   	<if test="type!=null">and type=#{type}</if>
+		   	<if test="status!=null and 10>status">and status=#{status}</if>
+		   	<if test="status!=null and status==10">and (status=1 or status=-2)</if>
+		   	<if test="uptype!=null">and uptype=#{uptype}</if>
+		</where>
+		order by create_date desc
+	</select>
+	
+	<select id="queryLesson" parameterType="com.cocosh.nlf.model.Norder" resultType="com.cocosh.nlf.model.Norder">
+		select nlf_norder.id,nlf_norder.sn,nlf_norder.status,nlf_lesson.name lesson_name,nlf_lesson.userage lesson_userage,nlf_lesson.image lesson_image,nlf_lesson.period lesson_period,nlf_lesson.price lesson_price 
+		from nlf_norder left join nlf_lesson on nlf_norder.conn_id=nlf_lesson.id 
+		<where>
+			<if test="type!=null">and nlf_norder.type=#{type}</if>
+			<if test="user_id!=null and user_id!=''">and nlf_norder.user_id=#{user_id}</if>
+		   	<if test="status!=null">and nlf_norder.status=#{status}</if>
+		   	<if test="id!=null">and nlf_norder.id=#{id}</if>
+		</where>
+		order by nlf_norder.create_date desc
+	</select>
+	
+	<select id="queryTicket" parameterType="com.cocosh.nlf.model.Norder" resultType="com.cocosh.nlf.model.Norder">
+		select nlf_norder.id,nlf_norder.sn,nlf_norder.status,nlf_ticket.name ticket_name,nlf_ticket.image ticket_image,nlf_ticket.price ticket_price 
+		from nlf_norder left join nlf_ticket on nlf_norder.conn_id=nlf_ticket.id 
+		<where>
+			<if test="type!=null">and nlf_norder.type=#{type}</if>
+			<if test="user_id!=null and user_id!=''">and nlf_norder.user_id=#{user_id}</if>
+		   	<if test="status!=null">and nlf_norder.status=#{status}</if>
+		   	<if test="id!=null">and nlf_norder.id=#{id}</if>
+		</where>
+		order by nlf_norder.create_date desc 
+	</select>
+	
+	
+	<select id="queryBySn" parameterType="String" resultType="com.cocosh.nlf.model.Norder">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_norder where sn=#{sn}
+	</select>
+</mapper>

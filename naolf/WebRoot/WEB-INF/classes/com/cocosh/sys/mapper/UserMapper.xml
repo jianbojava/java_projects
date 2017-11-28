@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.sys.mapper.UserMapper">
+	<insert id="add" parameterType="com.cocosh.sys.model.User">
+		insert into sys_user(id,province_id,province_name,city_id,city_name,region_id,region_name,username,password,nickname,mobile,head_img,is_locked,create_date,modify_date,type,depart_id,name,birthday,age,card,gender,address,email,bank_name,bank_no,bank_user,wx_no,ali_no,refer_number,number,user_type,partner_type,enabled,dispacth_grade)
+		values(#{id},#{province_id},#{province_name},#{city_id},#{city_name},#{region_id},#{region_name},#{username},#{password},#{nickname},#{mobile},#{head_img},#{is_locked},now(),now(),#{type},#{depart_id},#{name},#{birthday},#{age},#{card},#{gender},#{address},#{email},#{bank_name},#{bank_no},#{bank_user},#{wx_no},#{ali_no},#{refer_number},#{number},#{user_type},#{partner_type},#{enabled},#{dispacth_grade})
+	</insert>
+	
+	<delete id="delete">
+		delete from sys_user where id=#{id} and enabled=2
+	</delete>
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update sys_user set is_locked=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.sys.model.User">
+		update sys_user 
+		<set>
+			<if test="username!=null and username!=''">username=#{username},</if>
+			<if test="password!=null and password!=''">password=#{password},</if>
+			<if test="nickname!=null and nickname!=''">nickname=#{nickname},</if>
+			<if test="mobile!=null and mobile!=''">mobile=#{mobile},</if>
+			<if test="head_img!=null and head_img!=''">head_img=#{head_img},</if>
+			<if test="login_ip!=null and login_ip!=''">login_ip=#{login_ip},</if>
+			<if test="is_locked!=null and is_locked!=''">is_locked=#{is_locked},</if>
+			<if test="fail_count!=null and fail_count!=''">fail_count=#{fail_count},</if>
+			<if test="depart_id!=null and depart_id!=''">depart_id=#{depart_id},</if>
+			
+			<if test="name!=null and name!=''">name=#{name},</if>
+			<if test="birthday!=null and birthday!=''">birthday=#{birthday},</if>
+			<if test="card!=null and card!=''">card=#{card},</if>
+			<if test="age!=null and age!=''">age=#{age},</if>
+			<if test="gender!=null">gender=#{gender},</if>
+			<if test="address!=null and address!=''">address=#{address},</if>
+			<if test="email!=null and email!=''">email=#{email},</if>
+			<if test="bank_name!=null and bank_name!=''">bank_name=#{bank_name},</if>
+			<if test="bank_no!=null and bank_no!=''">bank_no=#{bank_no},</if>
+			<if test="bank_user!=null and bank_user!=''">bank_user=#{bank_user},</if>
+			<if test="wx_no!=null and wx_no!=''">wx_no=#{wx_no},</if>
+			<if test="ali_no!=null and ali_no!=''">ali_no=#{ali_no},</if>
+			<if test="refer_number!=null and refer_number!=''">refer_number=#{refer_number},</if>
+			<if test="number!=null and number!=''">number=#{number},</if>
+			<if test="user_type!=null">user_type=#{user_type},</if>
+			<if test="partner_type!=null">partner_type=#{partner_type},</if>
+			<if test="province_id!=null">province_id=#{province_id},</if>
+			<if test="province_name!=null">province_name=#{province_name},</if>
+			<if test="city_id!=null">city_id=#{city_id},</if>
+			<if test="city_name!=null">city_name=#{city_name},</if>
+			<if test="region_id!=null">region_id=#{region_id},</if>
+			<if test="region_name!=null">region_name=#{region_name},</if>
+			<if test="enabled!=null">enabled=#{enabled},</if>
+			<if test="dispacth_grade!=null">dispacth_grade=#{dispacth_grade},</if>
+		</set>
+		,modify_date=now() where id=#{id}
+	</update>
+	<update id="updatePwdByMobile" parameterType="com.cocosh.sys.model.User">
+		update sys_user set password=#{password} where mobile=#{mobile} and is_locked=0
+	</update>
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.sys.model.User">
+		select u.id,u.province_id,u.province_name,u.city_id,u.city_name,u.region_id,u.region_name,u.username,u.name,u.password,u.nickname,u.mobile,u.head_img,u.login_ip,u.is_locked,u.fail_count,u.create_date,u.type,u.depart_id,u.number,u.refer_number,u.enabled,u.partner_type,d.name as depart_name
+		 from sys_user u  left join sys_depart d on u.depart_id=d.id
+		<where>
+			<if test="keywords!=null and keywords!=''">and (u.name like '%${keywords}%' or u.username like '%${keywords}%' or u.mobile like '%${keywords}%' or u.number like '%${keywords}%' or u.refer_number like '%${keywords}%' )</if>
+		    <if test="depart_id!=null and depart_id!=''">and u.depart_id=#{depart_id}</if>
+		    <if test="user_type!=null">and u.user_type=#{user_type}</if>
+		    <if test="enabled!=null">and u.enabled=#{enabled}</if>
+		    <if test="is_locked!=null">and u.is_locked=#{is_locked}</if>
+		    <if test="user_id!=null and user_id!=''">and u.depart_id in (select depart_id from sys_user_depart where user_id=#{user_id})</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">#{orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by u.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.sys.model.User">
+		select u.*, d.name depart_name from sys_user u left join sys_depart d on u.depart_id=d.id where u.id=#{id}
+	</select>
+	
+	<select id="queryLogin" parameterType="com.cocosh.sys.model.User" resultType="com.cocosh.sys.model.User">
+		select id,province_id,province_name,city_id,city_name,region_id,region_name,username,number,nickname,password,mobile,head_img,is_locked,type,depart_id,enabled,user_type from sys_user where (username=#{username} or number=#{username}) and password=#{password} and is_locked=0
+	</select>
+	
+	
+	<select id="loginByUserNumber" parameterType="com.cocosh.sys.model.User" resultType="com.cocosh.sys.model.User">
+		select * from sys_user where (username=#{username} or number=#{username}) and password=#{password} and is_locked=0
+	</select>
+	<select id="loginByMobile" parameterType="com.cocosh.sys.model.User" resultType="com.cocosh.sys.model.User">
+		select * from sys_user where mobile=#{mobile} and password=#{password} and is_locked=0
+	</select>
+	<select id="checkUser" parameterType="com.cocosh.sys.model.User" resultType="com.cocosh.sys.model.User">
+		select * from sys_user
+		<where> is_locked=0
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(username)"> and username=#{username}</if>
+		</where>
+	</select>
+	
+	<select id="queryByMobile" parameterType="String" resultType="com.cocosh.sys.model.User">
+		select * from sys_user where mobile=#{mobile} and  is_locked=0
+	</select>
+	
+	<select id="queryByRole" parameterType="String" resultType="com.cocosh.sys.model.User">
+		SELECT id,username from (SELECT DISTINCT user_id from sys_user_role WHERE role_id=#{role_id})r 
+		LEFT JOIN sys_user u ON r.user_id=u.id ORDER BY u.create_date DESC
+	</select>
+	
+	<select id="queryByNumber" parameterType="String" resultType="com.cocosh.sys.model.User">
+		select * from sys_user where number=#{number} and number is not null
+	</select>
+	
+	<select id="queryByUsertype" parameterType="com.cocosh.sys.model.User"  resultType="com.cocosh.sys.model.User">
+		select id,number,username,nickname,name,refer_number,depart_id from sys_user where is_locked=0 and enabled=1
+		 <if test="user_type!=null and user_type!=''"> and user_type=#{user_type}</if>
+	</select>
+</mapper>

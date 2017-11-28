@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.OrderDisRateSettingMapper">
+	<sql id="Base_Column_List">
+		rate_type,rate,description
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.OrderDisRateSetting">
+		insert into nlf_rate_configure(rate_type,rate,description)
+		values(#{rate_type},#{rate},#{description})
+	</insert>
+	
+	<delete id="del">
+		delete from nlf_rate_configure where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</delete>
+	
+	<update id="update" parameterType="com.cocosh.nlf.model.OrderDisRateSetting">
+		update nlf_rate_configure 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(rate)">rate=#{rate},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(description)">description=#{description},</if>
+		</set> 
+		,modify_date=now() where rate_type=#{rate_type}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.OrderDisRateSetting">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_rate_configure 
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.OrderDisRateSetting">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_rate_configure where id=#{id}
+	</select>
+	
+	
+	<select id="queryByRate_type" parameterType="String" resultType="com.cocosh.nlf.model.OrderDisRateSetting">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_rate_configure where rate_type=#{rate_type}
+	</select>
+	
+</mapper>

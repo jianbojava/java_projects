@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.AppointMapper">
+	<sql id="Base_Column_List">
+		nlf_appoint.id,nlf_appoint.about_date,nlf_appoint.study_date,nlf_appoint.user_id,nlf_appoint.student_id,nlf_appoint.norder_id,nlf_appoint.course_id,
+		nlf_appoint.lesson_id,nlf_appoint.status,nlf_appoint.create_date,nlf_appoint.modify_date,nlf_appoint.enabled,nlf_appoint.course_type,nlf_appoint.user_ticket_id,nlf_appoint.tcomment,
+		nlf_student.id student_ids,nlf_student.name student_name,nlf_student.age student_age,nlf_student.gender student_gender,
+		nlf_lesson.id lesson_ids,nlf_lesson.name lesson_name,
+		nlf_norder.id norder_ids,
+		nlf_course.id course_ids,
+		sys_user.id user_ids,sys_user.name user_name,sys_user.mobile user_mobile
+	</sql>
+	
+	<select id="queryAllId" resultType="com.cocosh.nlf.model.Appoint">
+		select nlf_appoint.*,nlf_lesson.catname lesson_catname,nlf_lesson.name lesson_name,nlf_lesson.rule_id lesson_role_id
+		from nlf_appoint left join nlf_lesson on nlf_appoint.lesson_id=nlf_lesson.id 
+		where nlf_appoint.user_id=#{id} ORDER BY nlf_appoint.create_date desc
+	</select>
+	
+	<select id="queryAllStatus" resultType="com.cocosh.nlf.model.Appoint">
+		select * from nlf_appoint
+		where course_id=#{course_id} and status=#{status}
+	</select>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.Appoint">
+		insert into nlf_appoint(id,enabled,user_id,student_id,norder_id,course_id,lesson_id,status,create_date,modify_date,about_date,study_date,course_type,user_ticket_id)
+		values(#{id},#{enabled},#{user_id},#{student_id},#{norder_id},#{course_id},#{lesson_id},#{status},now(),now(),now(),#{study_date},#{course_type},#{user_ticket_id})
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_field"/>
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update nlf_appoint set ${del_field}=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.nlf.model.Appoint">
+		update nlf_appoint 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(user_id)">user_id=#{user_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(student_id)">student_id=#{student_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(norder_id)">norder_id=#{norder_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(course_id)">course_id=#{course_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(lesson_id)">lesson_id=#{lesson_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(status)">status=#{status},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(about_date)">about_date=#{about_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(study_date)">study_date=#{study_date},</if>
+		    <if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(tcomment)">tcomment=#{tcomment},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.Appoint">
+		select 
+		<include refid="Base_Column_List" />,ref.name ref_name,ref.mobile ref_mobile from 
+		nlf_appoint left join nlf_student on nlf_appoint.student_id=nlf_student.id
+		left join nlf_lesson on nlf_appoint.lesson_id=nlf_lesson.id
+		left join nlf_norder on nlf_appoint.norder_id=nlf_norder.id
+		left join nlf_course on nlf_appoint.course_id=nlf_course.id
+		left join sys_user on nlf_appoint.user_id=sys_user.id
+		left join sys_user ref on sys_user.refer_number=ref.number
+		<where>
+			<if test="keywords!=null and keywords!=''">(nlf_student.name like '%${keywords}%' or sys_user.name like '%${keywords}%')</if>
+			<if test="course_id!=null and course_id!=''">and nlf_appoint.course_id=#{course_id}</if>
+			<if test="depart_id!=null and depart_id!=''">and nlf_course.depart_id=#{depart_id}</if>
+			<if test="status!=null">and nlf_appoint.status=#{status}</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by nlf_appoint.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.Appoint">
+		select * from nlf_appoint where id=#{id}
+	</select>
+	
+	<select id="queryUtIds"  resultType="String">
+	   select GROUP_CONCAT(user_ticket_id) from nlf_appoint where id in 
+			<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+	</select>
+	
+	<select id="queryIds" parameterType="com.cocosh.nlf.model.Appoint" resultType="String">
+	   select GROUP_CONCAT(id) from nlf_appoint 
+	   <where>
+			<if test="course_id!=null and course_id!=''">course_id=#{course_id}</if>
+			<if test="status!=null and status>=0"> and status=#{status}</if>
+			<if test="status!=null and status==-1"> and <![CDATA[ status<=2  ]]>  </if>
+			<if test="status!=null and status==-2"> and <![CDATA[ status<2  ]]>  </if>
+		</where> 
+	</select>
+	
+	<select id="queryCount" parameterType="com.cocosh.nlf.model.Appoint" resultType="Integer">
+	    select count(*) from nlf_appoint
+	    <where>
+			<if test="user_ticket_id!=null and user_ticket_id!=''">and user_ticket_id=#{user_ticket_id}</if>
+			<if test="course_type!=null">and course_type=#{course_type}</if>
+			<if test="status!=null and  10>status">and status=#{status}</if>
+			<if test="status!=null and status==10">and (status=0 or status=1)</if>
+			<if test="status!=null and status==100">and status!=2</if>
+			<if test="course_id!=null and course_id!=''">and course_id=#{course_id}</if>
+			<if test="student_id!=null and student_id!=''">and student_id=#{student_id}</if>
+		</where>
+	</select>
+	
+	
+	<select id="queryWapAll" parameterType="com.cocosh.nlf.model.Appoint" resultType="com.cocosh.nlf.model.Appoint">
+		select * from nlf_appoint 
+			<where>
+				<if test="user_ticket_id!=null and user_ticket_id!=''">and user_ticket_id=#{user_ticket_id}</if>
+				<if test="course_id!=null and course_id!=''">and course_id=#{course_id}</if>
+			    <if test="student_id!=null and student_id!=''">and student_id=#{student_id}</if>
+				<if test="status!=null">and status=#{status}</if>
+				<if test="id!=null and id!=''">and id=#{id}</if>
+			</where>
+			
+	</select>
+	
+	<select id="queryWapCoures" parameterType="com.cocosh.nlf.model.Appoint" resultType="com.cocosh.nlf.model.Appoint">
+	select * from nlf_appoint
+		<where>
+		    <if test="user_ticket_id!=null and user_ticket_id!=''">and user_ticket_id=#{user_ticket_id}</if>
+		    <if test="course_type!=null">and course_type=#{course_type}</if>
+			<if test="course_id!=null and course_id!=''">and course_id=#{course_id}</if>
+			<if test="student_id!=null and student_id!=''">and student_id=#{student_id}</if>
+			<if test="norder_id!=null and norder_id!=''">and norder_id=#{norder_id}</if>
+			<if test="status!=null and 10>status">and status=#{status}</if>
+			<if test="status!=null and status==100">and status!=2</if>
+		</where>
+		
+	</select>
+	<!-- 查询最近的一次预约 -->
+	<select id="queryLastAppoint" parameterType="com.cocosh.nlf.model.Appoint" resultType="com.cocosh.nlf.model.Appoint">
+	select a.*,d.name depart_name from nlf_appoint a left join nlf_course c on a.course_id=c.id
+	     left join sys_depart d on  c.depart_id=d.id 
+	     where a.user_ticket_id=#{user_ticket_id} and a.status!=2
+         order by a.create_date desc limit 0,1
+	</select>
+	
+	<!-- 查询最近的一次上课 -->
+	<select id="queryLastClass" parameterType="com.cocosh.nlf.model.Appoint" resultType="com.cocosh.nlf.model.Appoint">
+	select a.*,d.name depart_name from nlf_appoint a left join nlf_course c on a.course_id=c.id
+	     left join sys_depart d on  c.depart_id=d.id 
+	     where a.user_ticket_id=#{user_ticket_id} and a.status>=3
+         order by a.create_date desc limit 0,1
+	</select>
+	
+	<!-- 预约或者上课记录 -->
+	<select id="queryRecord" parameterType="com.cocosh.nlf.model.Appoint" resultType="com.cocosh.nlf.model.Appoint">
+	  select n.*,c.start_time course_date,d.name depart_name from nlf_appoint n 
+	            left join nlf_course c on n.course_id=c.id 
+	           left join sys_depart d on d.id= c.depart_id
+	           where n.user_ticket_id=#{user_ticket_id} 
+	           <if test="status!=null and status==1000">and n.status>=3</if>
+			   <if test="status!=null and status==100">and n.status!=2</if>
+	            order by n.course_type desc, n.create_date asc 
+	</select>
+	
+	
+	<!--订单退款未结业的集中预约已取消 -->
+	<update id="updateToReturn" >
+		update nlf_appoint set status=2 where <![CDATA[ status<4]]> and course_type=1 and norder_id=#{norder_id}
+	</update>
+	<!-- 根据预约id查询会员的id，添加消息 用到-->
+	<select id="queryUserIds" resultType="String" >
+		select GROUP_CONCAT(user_id) from nlf_appoint where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</select>
+	<!-- 提醒上课，只有一天 -->
+	<select id="queryRemind" resultType="com.cocosh.nlf.model.Appoint">
+		select a.*,c.start_time course_date,l.name lesson_name  from nlf_appoint a
+             left join nlf_course c on a.course_id=c.id
+             left join nlf_lesson l on a.lesson_id=l.id
+          where   (to_days(c.start_time)-to_days(now()))=1 and (a.status=0 or a.status=1) order by a.create_date desc   
+
+	</select>
+</mapper>

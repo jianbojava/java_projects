@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.sys.mapper.DepartMapper">
+	<sql id="Base_Column_List">
+		id,name,parent_id,sort,description,enabled,grade,province_id,province_name,city_id,city_name,region_id,region_name,address,type,performance_ind,longitude,latitude
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.sys.model.Depart">
+		insert into sys_depart(id,name,parent_id,sort,description,enabled,grade,province_id,province_name,city_id,city_name,region_id,region_name,address,type,performance_ind,longitude,latitude)
+		values(#{id},#{name},#{parent_id},#{sort},#{description},0,#{grade},#{province_id},#{province_name},#{city_id},#{city_name},#{region_id},#{region_name},#{address},#{type},#{performance_ind},#{longitude},#{latitude})
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update sys_depart set enabled=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.sys.model.Depart">
+		update sys_depart 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(parent_id)">parent_id=#{parent_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sort)">sort=#{sort},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(description)">description=#{description},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(grade)">grade=#{grade},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(province_id)">province_id=#{province_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(province_name)">province_name=#{province_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(city_id)">city_id=#{city_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(city_name)">city_name=#{city_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(region_id)">region_id=#{region_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(region_name)">region_name=#{region_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(address)">address=#{address},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(type)">type=#{type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(performance_ind)">performance_ind=#{performance_ind},</if>
+		    <if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(longitude)">longitude=#{longitude},</if>
+		    <if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(latitude)">latitude=#{latitude},</if>
+		</set> 
+		where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.sys.model.Depart">
+		select 
+		<include refid="Base_Column_List" /> 
+		from sys_depart 
+		<where>
+			<if test="keywords!=null and keywords!=''">name like '%${keywords}%'</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by sort asc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.sys.model.Depart">
+		select 
+		<include refid="Base_Column_List" /> 
+		from sys_depart where id=#{id}
+	</select>
+	
+	<select id="queryParent" parameterType="String" resultType="com.cocosh.sys.model.Depart">
+		select 
+		<include refid="Base_Column_List" /> 
+		from sys_depart where grade=1
+	</select>
+	<select id="queryByPId" parameterType="String" resultType="com.cocosh.sys.model.Depart">
+		select 
+		<include refid="Base_Column_List" /> 
+		from sys_depart where grade=#{grade}
+	</select>
+	
+	<select id="queryChild" parameterType="String" resultType="com.cocosh.sys.model.Depart">
+		select id,name,sort,grade,parent_id,enabled,description,type,performance_ind
+		from sys_depart where parent_id=#{parent_id} order by sort asc 
+	</select>
+	
+	<select id="queryTreeChild" parameterType="String" resultType="com.cocosh.framework.tree.TreeNode">
+		select id,name as text
+		from sys_depart where parent_id=#{parent_id} order by sort asc 
+	</select>
+	
+	<select id="queryByAll" resultType="com.cocosh.sys.model.Depart">
+		select * from sys_depart where enabled=0 and grade = 2 order by sort asc
+	</select>
+	
+	<select id="queryByAllNew" resultType="com.cocosh.sys.model.Depart">
+		select * from sys_depart where enabled=0 and performance_ind=1
+	</select>
+	
+	<select id="queryByAllNew2" resultType="com.cocosh.sys.model.Depart">
+		select * from sys_depart where enabled=0
+	</select>
+	
+	<select id="queryCenter" resultType="com.cocosh.sys.model.Depart">
+		select * from sys_depart where enabled=0 and type=0 order by sort asc
+	</select>
+	
+	<select id="queryProvince" resultType="com.cocosh.sys.model.Regions">
+		select * from sys_regions where id in (select province_id from sys_depart where enabled=0 and type=0 order by sort asc )  
+	</select>
+	
+	<select id="queryCity" resultType="com.cocosh.sys.model.Regions">
+		select * from sys_regions where id in (select city_id from sys_depart where province_id=#{province_id} and  enabled=0 and type=0 order by sort asc )  
+	</select>
+	
+	<select id="queryByRegion" resultType="com.cocosh.sys.model.Depart" parameterType="com.cocosh.sys.model.Regions">
+	   select * from sys_depart where  enabled=0 and type=0
+	    <if test="province_id!=null and province_id!=''"> and province_id=#{province_id}</if>
+		<if test="city_id!=null and city_id!=''">and  city_id=#{city_id}</if>
+	</select>
+	
+	
+</mapper>

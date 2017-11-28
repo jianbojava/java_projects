@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.sys.mapper.PushMapper">
+
+	<insert id="add" parameterType="com.cocosh.sys.model.Push">
+		insert into sys_push(id,content,alias,platform,application,create_date)
+		values(#{id},#{content},#{alias},#{platform},#{application},now())
+	</insert>
+	
+	<delete id="del">
+		delete from sys_push where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</delete>
+	
+	<select id="query" parameterType="com.cocosh.sys.model.Push" resultType="com.cocosh.sys.model.Push">
+		select * from sys_push 
+		<where>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(alias)">alias=#{alias}</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(content)">and content like '%${content}%'</if>
+		</where>
+		order by create_date desc 
+		<if test="startIndex!=null">limit #{startIndex},#{pageSize}</if>
+	</select>
+	
+	<select id="queryCount" parameterType="com.cocosh.sys.model.Push" resultType="Integer">
+		select count(*) from sys_push 
+		<where>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(alias)">alias=#{alias}</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(content)">and content like '%${content}%'</if>
+		</where>
+	</select>
+	
+	<select id="queryByMid" parameterType="String" resultType="com.cocosh.sys.model.Push">
+		select content,create_date from sys_push where alias=#{alias} order by create_date desc 
+	</select>
+	
+	<select id="queryMobile" parameterType="Integer" resultType="String">
+		<if test="_parameter==0">
+			SELECT mobile FROM shop_member WHERE mobile is not NULL
+		</if>
+		<if test="_parameter==1">
+			SELECT username from sys_user WHERE type=1
+		</if>
+	</select>
+	
+</mapper>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.RefundDepositMapper">
+	<sql id="Base_Column_List">
+		sn,mem_id,amount,solve,remark,create_date,modify_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.car.model.RefundDeposit">
+		insert into zxj_refund_deposit(sn,mem_id,amount,create_date)
+		values(#{sn},#{mem_id},#{amount},now())
+	</insert>
+	
+	<update id="update" parameterType="com.cocosh.car.model.RefundDeposit">
+		update zxj_refund_deposit 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(is_solve)">is_solve=#{is_solve},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(remark)">remark=#{remark},</if>
+		</set> 
+		,modify_date=now() where sn in 
+		<foreach item="item" index="index" collection="sns" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.RefundDeposit">
+		SELECT r.sn,r.amount,r.is_solve,r.remark,r.create_date,r.modify_date,m.name mem_name,m.mobile mem_mobile from zxj_refund_deposit r 
+		LEFT JOIN zxj_member m ON r.mem_id=m.id
+		<where>
+			<if test="keywords!=null and keywords!=''">(m.name like '%${keywords}%' or m.mobile like '%${keywords}%')</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by r.create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryBySns" parameterType="String" resultType="com.cocosh.car.model.RefundDeposit">
+		SELECT amount,mem_id from zxj_refund_deposit 
+		where sn in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+</mapper>

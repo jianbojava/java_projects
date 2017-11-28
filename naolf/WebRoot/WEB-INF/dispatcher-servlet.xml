@@ -1,0 +1,124 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans     
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
+
+	<!-- 支持mvc注解 -->
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="true">
+			<!-- 将StringHttpMessageConverter的默认编码设为UTF-8 -->
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+				<constructor-arg value="UTF-8" />
+			</bean>
+			<!-- 避免IE执行AJAX时,返回JSON出现下载文件 -->
+			<bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+				<property name="supportedMediaTypes" value="application/json;charset=utf-8"/>
+				<property name="features">
+	                <array>
+	                	<!-- 输出空置字段 -->
+	                    <value>WriteMapNullValue</value>
+	                    <!-- 字符串如果为null,输出为"" -->
+	                    <value>WriteNullStringAsEmpty</value>
+	                    <!-- 数值如果为null,输出为0 -->
+	                    <value>WriteNullNumberAsZero</value>
+	                    <!-- list字段为null,输出为[] -->
+	                    <value>WriteNullListAsEmpty</value>
+	                </array>
+	            </property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+	
+	<!-- 通知spring使用cglib而不是jdk的来生成代理方法 -->
+	<aop:aspectj-autoproxy proxy-target-class="true"/>
+	
+	 <!-- 指定自动扫描controller路径 -->
+    <context:component-scan base-package="com.cocosh"/>
+    
+	<!--  当访问主页时自动转发到login控制器 -->
+	<mvc:view-controller path="/" view-name="forward:wap/index"/>
+	<mvc:view-controller path="/wap" view-name="forward:wap/index"/>
+	<mvc:view-controller path="/manage" view-name="forward:manage/login"/>
+	
+	<!-- 资源访问 -->
+	<mvc:default-servlet-handler />
+	<mvc:resources location="/statics/" mapping="/statics/**" cache-period="2592000" />
+	
+	<bean id="freemarkerConfig" class="com.cocosh.framework.shiro.FreeMarkerConfigurer">
+		<property name="templateLoaderPath" value="/WEB-INF/views/" />
+		<property name="freemarkerSettings">
+       		<props>
+       			<prop key="defaultEncoding">UTF-8</prop>
+       		</props>
+       	</property>
+	</bean>
+	
+	<!--对模型视图名称的解析，即在模型视图名称添加前后缀-->
+	<bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+		<property name="cache" value="true" />
+		<property name="prefix" value="" />
+		<property name="suffix" value=".html" />
+        <property name="exposeSpringMacroHelpers" value="true"/>
+        <property name="exposeRequestAttributes" value="true"/>
+        <property name="exposeSessionAttributes" value="true"/>
+        <property name="allowSessionOverride" value="true"/>
+        <property name="requestContextAttribute" value="request"/>
+		<property name="contentType" value="text/html; charset=UTF-8" />
+		<property name="order" value="1"/>
+	</bean>
+	
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+		<property name="order" value="2"/>
+	</bean>
+
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="1024000000" />
+		<property name="resolveLazily" value="true" />
+		<property name="maxInMemorySize" value="4096" />
+	</bean>
+
+	<!-- Interceptor拦截器 -->
+	<mvc:interceptors>
+		<!-- session拦截器 -->
+		<mvc:interceptor> 
+		      <mvc:mapping path="/wap/course/**"/>
+		      <mvc:mapping path="/wap/my/**" />
+		      <bean class="com.cocosh.framework.interceptor.SessionInterceptor"/>
+		 </mvc:interceptor>
+		<!-- cookie拦截器 -->
+		<mvc:interceptor>
+			<mvc:mapping path="/wap/order/**" />
+			<bean class="com.cocosh.framework.interceptor.CookieInterceptor" />
+		</mvc:interceptor>
+		
+		<!-- 拦截器仅允许在微信端打开 
+		<mvc:interceptor>
+			<mvc:mapping path="/wap/**" />
+			<bean class="com.cocosh.framework.interceptor.UrlInterceptor" />
+		</mvc:interceptor>
+		-->
+		<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" />
+	</mvc:interceptors>
+	
+    <!-- 国际化配置 -->
+	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver" />
+	<!-- 国际化支持 -->
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="messages" />
+        <property name="useCodeAsDefaultMessage" value="true" />
+    </bean>
+</beans>
+
+
+

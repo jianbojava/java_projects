@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.member.mapper.FirmMapper">
+	<sql id="Base_Column_List">
+		id,name,tel,representer,address,email,url,bus_license,sale_id,sale_name,IFNULL(deposit,0.00) deposit,IFNULL(credit_amount,0.00) credit_amount,IFNULL(used_amount,0.00) used_amount,IFNULL(left_amount,0.00) left_amount,pay_type,sign_date,end_date,remark,enabled,create_date,modify_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.member.model.Firm">
+		insert into zxj_firm(id,name,tel,representer,address,email,url,bus_license,sale_id,sale_name,deposit,credit_amount,used_amount,left_amount,pay_type,sign_date,end_date,remark,enabled,create_date,modify_date)
+		values(#{id},#{name},#{tel},#{representer},#{address},#{email},#{url},#{bus_license},#{sale_id},#{sale_name},#{deposit},#{credit_amount},#{used_amount},#{left_amount},#{pay_type},#{sign_date},#{end_date},#{remark},0,now(),now())
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update zxj_firm set enabled=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.member.model.Firm">
+		update zxj_firm 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(tel)">tel=#{tel},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(representer)">representer=#{representer},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(address)">address=#{address},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(email)">email=#{email},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(url)">url=#{url},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(bus_license)">bus_license=#{bus_license},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sale_id)">sale_id=#{sale_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sale_name)">sale_name=#{sale_name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(deposit)">deposit=#{deposit},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(credit_amount)">credit_amount=#{credit_amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(used_amount)">used_amount=#{used_amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(left_amount)">left_amount=#{left_amount},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(pay_type)">pay_type=#{pay_type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(sign_date)">sign_date=#{sign_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(end_date)">end_date=#{end_date},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(remark)">remark=#{remark},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.member.model.Firm">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_firm 
+		<where>
+			<if test="keywords!=null and keywords!=''">name like '%${keywords}%'</if>
+			<if test="user_id!=null and user_id!=''">and sale_id = #{user_id}</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by #{orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">#{orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.member.model.Firm">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_firm where id=#{id}
+	</select>
+	
+	<select id="queryAll"  resultType="com.cocosh.member.model.Firm">
+		select id,name from zxj_firm where enabled=0
+	</select>
+	
+	<!-- 下单扣钱、增加信用额度等 -->
+	<update id="updateAccount" parameterType="com.cocosh.member.model.Firm">
+		update zxj_firm set deposit=#{deposit},credit_amount=#{credit_amount},used_amount=#{used_amount},left_amount=#{left_amount} where id=#{id} 
+	</update>
+
+	<!-- Excel导入 -->
+	<select id="queryFirmByExcel" resultType="com.cocosh.member.model.Firm">
+		select DISTINCT id,name from zxj_firm where name in 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+</mapper>

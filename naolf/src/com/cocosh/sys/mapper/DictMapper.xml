@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.sys.mapper.DictMapper">
+	<sql id="Base_Column_List">
+		code,name,content,grade,p_code,remark,modify_date,enabled
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.sys.model.Dict">
+		insert into sys_dict(code,name,content,grade,p_code,remark,create_date,modify_date,enabled)
+		values(#{code},#{name},#{content},#{grade},#{p_code},#{remark},now(),now(),0)
+	</insert>
+	
+	<delete id="del">
+		delete from sys_dict where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</delete>
+	
+	<update id="update" parameterType="com.cocosh.sys.model.Dict">
+		update sys_dict 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(content)">content=#{content},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(grade)">grade=#{grade},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(p_code)">p_code=#{p_code},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(remark)">remark=#{remark},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+		</set> 
+		,modify_date=now() where code=#{code}
+	</update>
+	
+	<select id="queryAll" resultType="com.cocosh.sys.model.Dict">
+		select 
+		<include refid="Base_Column_List" /> 
+		from sys_dict where grade=0 order by sort asc,create_date desc 
+	</select>
+	
+	<select id="queryCAll" parameterType="String" resultType="com.cocosh.sys.model.Dict">
+		select 
+		<include refid="Base_Column_List" /> 
+		from sys_dict where p_code=#{code} order by sort asc,create_date desc 
+	</select>
+	
+	<select id="queryByCode" parameterType="String" resultType="String">
+		select content from sys_dict where code=#{code}
+	</select>
+	
+</mapper>

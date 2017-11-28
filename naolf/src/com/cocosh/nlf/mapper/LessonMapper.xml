@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.LessonMapper">
+	<sql id="Base_Column_List">
+		id,type,train,catname,name,rule_id,period,userage,price,enabled,image,advantage,special,content,create_date,modify_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.nlf.model.Lesson">
+		insert into nlf_lesson(id,rule_id,train,type,catname,name,period,userage,price,enabled,image,advantage,special,content,create_date,modify_date)
+		values(#{id},#{rule_id},#{train},#{type},#{catname},#{name},#{period},#{userage},#{price},#{enabled},#{image},#{advantage},#{special},#{content},now(),now())
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update nlf_lesson set enabled=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	<select id="queryByIds" resultType="com.cocosh.nlf.model.Lesson" >
+		select * from nlf_lesson where id in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</select>
+	<update id="update" parameterType="com.cocosh.nlf.model.Lesson">
+		update nlf_lesson 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(catname)">catname=#{catname},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(period)">period=#{period},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(userage)">userage=#{userage},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(price)">price=#{price},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(image)">image=#{image},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(advantage)">advantage=#{advantage},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(special)">special=#{special},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(type)">type=#{type},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(train)">train=#{train},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(rule_id)">rule_id=#{rule_id},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(content)">content=#{content},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.Lesson">
+		select 
+		nlf_lesson.id,nlf_lesson.type,nlf_lesson.train,nlf_lesson.catname,nlf_lesson.name,nlf_lesson.rule_id,nlf_lesson.period,
+		nlf_lesson.userage,nlf_lesson.price,nlf_lesson.enabled,nlf_lesson.image,nlf_lesson.advantage,nlf_lesson.special,
+		nlf_lesson.content,nlf_lesson.create_date,nlf_lesson.modify_date,
+		CONCAT(nlf_rule.sn_header,nlf_rule.sn_start,nlf_rule.sn_middle,nlf_rule.sn_end) rule_sn from
+ 		nlf_lesson left join nlf_rule on nlf_lesson.rule_id=nlf_rule.id
+		<where>
+			<if test="keywords!=null and keywords!=''">nlf_lesson.name like '%${keywords}%'</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryAll" resultType="com.cocosh.nlf.model.Lesson">
+		select
+		<include refid="Base_Column_List" />
+		from nlf_lesson where enabled=0
+	</select>
+	
+	<select id="clearPage" resultType="com.cocosh.nlf.model.Lesson">
+		select *  from nlf_lesson where enabled=0 
+	</select>
+	<select id="queryLessonId" parameterType="com.cocosh.nlf.model.Lesson" resultType="com.cocosh.nlf.model.Lesson">
+		select l.*,ut.status,ut.id ut_id
+		   from nlf_lesson l left join nlf_user_ticket ut on l.id=ut.conn_id
+		  <where>
+			<if test="ut_id!=null and ut_id!=''">and ut.id=#{ut_id}</if>
+		</where>
+	</select>
+	<select id="queryById" parameterType="String" resultType="com.cocosh.nlf.model.Lesson">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_lesson where id=#{id}
+	</select>
+	<select id="queryByAll" resultType="com.cocosh.nlf.model.Lesson">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_lesson where enabled=0 order by create_date desc
+	</select>
+	
+	<select id="checkName" resultType="com.cocosh.nlf.model.Lesson">
+		select * from nlf_lesson 
+		<where>
+		<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name}</if>
+		</where>
+	</select>
+	
+</mapper>

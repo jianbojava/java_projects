@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.car.mapper.StationInfoMapper">
+	<sql id="Base_Column_List">
+		stationID,operatorID,equipmentOwnerID,stationName,countryCode,areaCode,address,stationTel,serviceTel,stationType,
+		stationStatus,parkNums,stationLng,stationLat,siteGuide,construction,pictures,matchCars,parkInfo,busineHours,IFNULL(elePrice,0.00) elePrice,IFNULL(serPrice,0.00) serPrice,
+		electricityFee,serviceFee,parkFee,payment,supportOrder,remark,enabled,type
+	</sql>
+	
+	<insert id="add" parameterType="java.util.List">
+		insert into zxj_stationInfo(stationID,operatorID,equipmentOwnerID,stationName,countryCode,areaCode,address,stationTel,serviceTel,stationType,stationStatus,parkNums,stationLng,stationLat,siteGuide,construction,pictures,matchCars,parkInfo,busineHours,elePrice,serPrice,electricityFee,serviceFee,parkFee,payment,supportOrder,remark,create_date,modify_date,enabled,type) values 
+		<foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.stationID},#{item.operatorID},#{item.equipmentOwnerID},#{item.stationName},#{item.countryCode},#{item.areaCode},#{item.address},#{item.stationTel},#{item.serviceTel},#{item.stationType},#{item.stationStatus},#{item.parkNums},#{item.stationLng},#{item.stationLat},#{item.siteGuide},#{item.construction},#{item.pictures},#{item.matchCars},#{item.parkInfo},#{item.busineHours},#{item.elePrice},#{item.serPrice},#{item.electricityFee},#{item.serviceFee},#{item.parkFee},#{item.payment},#{item.supportOrder},#{item.remark},now(),now(),0,#{item.type}) 
+	    </foreach>
+	    ON DUPLICATE KEY UPDATE operatorID=VALUES(operatorID),
+	    equipmentOwnerID=VALUES(equipmentOwnerID),
+	    stationName=VALUES(stationName),
+	    countryCode=VALUES(countryCode),
+	    areaCode=VALUES(areaCode),
+	    address=VALUES(address),
+	    stationTel=VALUES(stationTel),
+	    serviceTel=VALUES(serviceTel),
+	    stationType=VALUES(stationType),
+	    stationStatus=VALUES(stationStatus),
+	    parkNums=VALUES(parkNums),
+	    stationLng=VALUES(stationLng),
+	    stationLat=VALUES(stationLat),
+	    siteGuide=VALUES(siteGuide),
+	    construction=VALUES(construction),
+	    pictures=VALUES(pictures),
+	    matchCars=VALUES(matchCars),
+	    parkInfo=VALUES(parkInfo),
+	    busineHours=VALUES(busineHours),
+	    elePrice=VALUES(elePrice),
+	    serPrice=VALUES(serPrice),
+	    electricityFee=VALUES(electricityFee),
+	    serviceFee=VALUES(serviceFee),
+	    parkFee=VALUES(parkFee),
+	    payment=VALUES(payment),
+	    supportOrder=VALUES(supportOrder),
+	    remark=VALUES(remark),
+	    modify_date=now()
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update zxj_stationInfo set enabled=#{del_flg} where stationID in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.car.model.StationInfo">
+		update zxj_stationInfo 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(operatorID)">operatorID=#{operatorID},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(equipmentOwnerID)">equipmentOwnerID=#{equipmentOwnerID},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(stationName)">stationName=#{stationName},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(countryCode)">countryCode=#{countryCode},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(areaCode)">areaCode=#{areaCode},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(address)">address=#{address},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(stationTel)">stationTel=#{stationTel},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(serviceTel)">serviceTel=#{serviceTel},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(stationType)">stationType=#{stationType},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(stationStatus)">stationStatus=#{stationStatus},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(parkNums)">parkNums=#{parkNums},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(stationLng)">stationLng=#{stationLng},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(stationLat)">stationLat=#{stationLat},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(siteGuide)">siteGuide=#{siteGuide},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(construction)">construction=#{construction},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(pictures)">pictures=#{pictures},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(matchCars)">matchCars=#{matchCars},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(parkInfo)">parkInfo=#{parkInfo},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(busineHours)">busineHours=#{busineHours},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(elePrice)">elePrice=#{elePrice},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(serPrice)">serPrice=#{serPrice},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(electricityFee)">electricityFee=#{electricityFee},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(serviceFee)">serviceFee=#{serviceFee},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(parkFee)">parkFee=#{parkFee},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(payment)">payment=#{payment},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(supportOrder)">supportOrder=#{supportOrder},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(remark)">remark=#{remark},</if>
+		</set> 
+		,modify_date=now() where stationID=#{stationID}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.car.model.StationInfo">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_stationInfo 
+		<where>
+			<if test="keywords!=null and keywords!=''">(stationID like '%${keywords}%' or stationName like '%${keywords}%')</if>
+		</where>
+		order by create_date desc
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.car.model.StationInfo">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_stationInfo where stationID=#{stationID}
+	</select>
+	
+	<select id="queryAll" resultType="com.cocosh.car.model.StationInfo">
+		select stationID,stationName from zxj_stationInfo where enabled=0 order by create_date desc
+	</select>
+	
+	<select id="query2Map" parameterType="vo" resultType="com.cocosh.car.model.StationInfo">
+		select s.stationID,s.stationName,s.stationStatus,s.stationLng,s.stationLat,c.totalConnNum from zxj_stationInfo s 
+		LEFT JOIN (SELECT stationID,COUNT(0) totalConnNum FROM zxj_connectorinfo WHERE status=1 AND enabled=0 GROUP BY stationID)c ON s.stationID=c.stationID 
+		where s.enabled=0 
+		<if test="status!=null and status!=''">and s.stationStatus=#{status}</if>
+	</select>
+	
+	<select id="queryPageApp" parameterType="vo" resultType="com.cocosh.car.model.StationInfo">
+		select s.stationID,s.stationName,s.address,s.stationLng,s.stationLat,s.stationStatus,s.stationType,s.type,o.operatorName,c_.quickConnNum,
+		SUBSTRING_INDEX(s.pictures,',',1) pictures,ROUND(IFNULL(s.elePrice,0.00)+IFNULL(s.serPrice,0.00),2) elePrice,IFNULL(TRUNCATE(avg(m.star),1),0) comment_star,
+		ROUND(6378.137*2*ASIN(SQRT(POW(SIN((#{latitude}*PI()/180-s.stationLat*PI()/180)/2),2)+
+		COS(#{latitude}*PI()/180)*COS(s.stationLat*PI()/180)*POW(SIN((#{longitude}*PI()/180-s.stationLng*PI()/180)/2),2))),2) as distances,c.totalConnNum 
+		from zxj_stationInfo s LEFT JOIN (SELECT stationID,COUNT(0) totalConnNum FROM zxj_connectorinfo WHERE status=1 AND enabled=0 GROUP BY stationID)c ON s.stationID=c.stationID 
+		LEFT JOIN (SELECT stationID,COUNT(0) quickConnNum FROM zxj_connectorinfo WHERE power<![CDATA[>=]]>30 AND enabled=0 GROUP BY stationID)c_ ON s.stationID=c_.stationID 
+		LEFT JOIN zxj_operatorInfo o ON s.operatorID=o.operatorID 
+		LEFT JOIN zxj_comment m on s.stationID=m.station_id 
+		where s.enabled=0 
+		<if test="keywords!=null and keywords!=''">and s.stationName like '%${keywords}%'</if>
+		<if test="type!=null and type!=''">and s.stationType in(${type})</if>
+		<if test="pay_type!=null and pay_type!=''">and s.payment in(${pay_type})</if>
+		<if test="status!=null and status!=''">and s.stationStatus in(${status})</if>
+		GROUP BY s.stationID 
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+				 ,s.create_date desc 
+			</when>
+			<otherwise>
+				 order by s.create_date desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryByIdApp" parameterType="vo" resultType="com.cocosh.car.model.StationInfo">
+		select s.stationID,s.stationName,s.address,s.siteGuide,s.stationLng,s.stationLat,s.stationTel,s.stationStatus,s.stationType,s.parkFee,s.busineHours,s.type,s.electricityFee,s.serviceFee,s.payment,
+		SUBSTRING_INDEX(s.pictures,',',1) pictures,ROUND(IFNULL(s.elePrice,0.00)+IFNULL(s.serPrice,0.00),2) elePrice,IFNULL(TRUNCATE(avg(m.star),1),0) comment_star,
+		ROUND(6378.137*2*ASIN(SQRT(POW(SIN((#{latitude}*PI()/180-s.stationLat*PI()/180)/2),2)+
+		COS(#{latitude}*PI()/180)*COS(s.stationLat*PI()/180)*POW(SIN((#{longitude}*PI()/180-s.stationLng*PI()/180)/2),2))),2) as distances  
+		from zxj_stationInfo s LEFT JOIN zxj_operatorInfo o ON s.operatorID=o.operatorID LEFT JOIN zxj_comment m on s.stationID=m.station_id where s.stationID=#{id}
+	</select>
+	
+	<delete id="delT">
+		delete from zxj_stationInfo where stationID in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>;
+		delete from zxj_equipmentInfo where stationID in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>;
+		delete from zxj_connectorInfo where stationID in 
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>;
+	</delete>
+</mapper>

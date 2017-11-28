@@ -1,0 +1,80 @@
+@charset "utf-8";
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,button,textarea,p,blockquote,th,td,label {margin:0px; padding:0px;}
+body { background:#fff; color:#484746; font-size:16px; font-family: "Microsoft YaHei", "宋体", Verdana, Arial, Helvetica, sans-serif; height:100%; }
+td,th,caption { font-size:16px; }
+h1, h2, h3, h4, h5, h6 { font-weight:normal; font-size:100%; }
+address, caption, cite, code, dfn, em, th, var { font-style:normal; font-weight:normal;}
+strong, b{ font-weight:bold;}
+a { color:#484746; text-decoration:none; }
+a:hover { text-decoration:none; }
+img { border:none; vertical-align:top; }
+ol,ul,li { list-style:none; }
+input, textarea, select, button { font-size:0.28rem; font-family: "Microsoft YaHei", "宋体", Verdana, Arial, Helvetica, sans-serif; outline:none; }
+input{outline:none;border:none;}
+table { border-collapse:collapse; border:0; }
+html {overflow-y: scroll;} 
+
+input[type="text"],
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: none;
+}
+
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  cursor: pointer;
+}
+
+input:disabled{ opacity:1; }
+
+*,*:before,*:after{ -webkit-box-sizing:border-box; box-sizing:border-box; }
+
+.clearfix:after { display: block; height:0; clear:both; visibility: hidden; content:"."; }
+.clearfix { *zoom:1; }
+.clear{ clear:both; }
+
+
+.fl{ float:left;}
+.fr{ float:right;}
+
+.none{ display:none; }
+
+.mTop15{ margin-top:0.15rem; }
+
+.mBtm10{ margin-bottom:0.1rem; }
+.mBtm20{ margin-bottom:0.2rem; }
+.mBtm30{ margin-bottom:0.3rem; }
+.mBtm91{ margin-bottom:0.91rem; }
+.mBtm76{ margin-bottom:0.76rem; }
+.mBtm96{ margin-bottom:0.96rem; }
+.mBtm95{ margin-bottom:0.95rem; }
+.mBtm106{ margin-bottom:1.06rem; }
+.mBtm115{ margin-bottom:1.15rem; }
+.mBtm150{ margin-bottom:1.5rem; }
+
+.pTop30{ padding-top:0.3rem; }
+.pTop90{ padding-top:0.9rem; }
+
+.pBtm20{ padding-bottom:0.2rem; }
+
+.f24{ font-size:0.24rem; }
+.f28{ font-size:0.28rem; }
+.f30{ font-size:0.3rem; }
+.f32{ font-size:0.32rem; }
+
+.bold{ font-weight:bold; }
+
+
+.color_a5a4a8{ color:#a5a4a8; }
+.color_745398{ color:#745398; }
+
+.bk_fff{ background:#fff; }
+
+.textR{ text-align:right; }
+.textC{ text-align:center; }
+
+.borderBtm{ border-bottom:1px solid #ddd; }
+
+.percentW75{ width:75%; }

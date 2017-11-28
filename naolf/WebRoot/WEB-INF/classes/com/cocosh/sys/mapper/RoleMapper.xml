@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.sys.mapper.RoleMapper">
+	<sql id="Base_Column_List">
+		id,name,description,available,create_date,modify_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.sys.model.Role">
+		insert into sys_role(id,name,description,available,create_date,modify_date)
+		values(#{id},#{name},#{description},#{available},now(),now())
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update sys_role set available=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.sys.model.Role">
+		update sys_role 
+		<set>
+			<if test="name!=null">name=#{name},</if>
+			<if test="description!=null">description=#{description},</if>
+			<if test="available!=null">available=#{available},</if>
+		</set>
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.sys.model.Role">
+		select 
+		<include refid="Base_Column_List" />
+		from sys_role 
+		<where>
+			<if test="keywords!=null and keywords!=''">and (name like '%${keywords}%' or description like '%${keywords}%')</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by #{orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">#{orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryAll" resultType="com.cocosh.sys.model.Role">
+		select
+		<include refid="Base_Column_List" />
+		from sys_role where available=0
+	</select>
+	
+	<select id="queryNameByUserId" parameterType="String" resultType="com.cocosh.sys.model.Role">
+		select ro.* from sys_role ro where ro.id in(select r.role_id from sys_user_role r where r.user_id=#{id})
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.sys.model.Role">
+		select * from sys_role  where id=#{id}
+	</select>
+	
+</mapper>

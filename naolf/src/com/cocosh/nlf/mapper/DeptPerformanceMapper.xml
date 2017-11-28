@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.nlf.mapper.DeptPerformanceMapper">
+	<sql id="Base_Column_List">
+		depart_id,create_mon,score score,d.name depart_name
+	</sql>
+	
+	
+	
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.nlf.model.DeptPerformance">
+		select 
+		<include refid="Base_Column_List" /> 
+		from nlf_dept_perform_v v
+			left join sys_depart d on (v.depart_id = d.id)
+		<where> 1=1 
+			<if test="depart_id!=null and depart_id!=''">and v.depart_id = '${depart_id}'</if>
+			<if test="timeStamp!=null and timeStamp!=''">and v.create_mon = '${timeStamp}'</if>
+			and v.depart_id in (
+			select ud.depart_id from sys_user_depart ud where ud.user_id=#{operat_id} 
+			) 
+		</where>
+		
+	</select>
+	
+	<select id="queryDetailPage" parameterType="vo" resultType="com.cocosh.nlf.model.DeptPerformance">
+		SELECT
+			j.depart_id,
+			j.score/(select c.rate from nlf_rate_configure c where c.rate_type = 'SCOREPERCENT')  score,
+			j.order_number,
+			j.create_date,
+			d.`name` depart_name
+		FROM
+			nlf_dept_score_journal j
+		LEFT JOIN sys_depart d ON (j.depart_id = d.id)
+		<where>
+			<if test="depart_id!=null and depart_id!=''"> and j.depart_id = '${depart_id}'</if>
+			<if test="timeStamp!=null and timeStamp!=''"> and DATE_FORMAT(create_date, '%Y%m') = '${timeStamp}'</if>
+		</where>
+		
+	</select>
+	<!-- 添加订单部门绩效 -->
+	<insert id="addDepartScore" parameterType="com.cocosh.nlf.model.DeptPerformance">
+		insert into nlf_dept_score_journal(depart_id,score,order_number,create_date)
+		values(#{depart_id},#{score},#{order_number},#{create_date})
+	</insert>
+	
+</mapper>

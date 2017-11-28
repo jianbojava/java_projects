@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.member.mapper.LevelMapper">
+	<sql id="Base_Column_List">
+		id,name,image,remark,minimum,maximum,enabled,create_date,modify_date
+	</sql>
+	
+	<insert id="add" parameterType="com.cocosh.member.model.Level">
+		insert into zxj_level(id,name,image,remark,minimum,maximum,enabled,create_date,modify_date)
+		values(#{id},#{name},#{image},#{remark},#{minimum},#{maximum},0,now(),now())
+	</insert>
+	
+	<parameterMap type="Map" id="delParms">
+		<parameter property="del_flg"/>
+		<parameter property="del_ids"/>
+	</parameterMap>
+	<update id="del" parameterMap="delParms">
+		update zxj_level set enabled=#{del_flg} where id in 
+		<foreach item="item" index="index" collection="del_ids" open="(" separator="," close=")">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="update" parameterType="com.cocosh.member.model.Level">
+		update zxj_level 
+		<set>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(name)">name=#{name},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(image)">image=#{image},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(remark)">remark=#{remark},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(minimum)">minimum=#{minimum},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(maximum)">maximum=#{maximum},</if>
+			<if test="@com.cocosh.framework.util.OgnlUtils@isNotNull(enabled)">enabled=#{enabled},</if>
+		</set> 
+		,modify_date=now() where id=#{id}
+	</update>
+	
+	<select id="queryPage" parameterType="vo" resultType="com.cocosh.member.model.Level">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_level 
+		<where>
+			<if test="keywords!=null and keywords!=''">name like '%${keywords}%'</if>
+		</where>
+		<choose>
+			<when test="orderField !=null and orderField !=''">
+				 order by ${orderField} 
+				 <if test="orderDirection != null and orderDirection != ''">${orderDirection}</if>
+			</when>
+			<otherwise>
+				 order by minimum asc,create_date desc 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryById" parameterType="String" resultType="com.cocosh.member.model.Level">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_level where id=#{id}
+	</select>
+	
+	<select id="queryMin" parameterType="String" resultType="com.cocosh.member.model.Level">
+		select 
+		<include refid="Base_Column_List" /> 
+		from zxj_level where enabled=0 order by minimum asc limit 0,1
+	</select>
+	
+</mapper>

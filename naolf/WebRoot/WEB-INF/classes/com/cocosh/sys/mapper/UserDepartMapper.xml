@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cocosh.sys.mapper.UserDepartMapper">
+	<insert id="add" parameterType="com.cocosh.sys.model.UserDepart">
+		insert into sys_user_depart(user_id,depart_id)
+		values(#{user_id},#{depart_id})
+	</insert>
+	
+	<delete id="del" parameterType="com.cocosh.sys.model.UserDepart">
+		delete from sys_user_depart
+		<where>
+			<if test="user_id!=null">user_id=#{user_id}</if>
+			<if test="depart_id!=null">and depart_id=#{depart_id}</if>		
+		</where> 
+	</delete>
+	
+	<select id="query" parameterType="com.cocosh.sys.model.UserDepart" resultType="com.cocosh.sys.model.UserDepart">
+		select * from sys_user_depart 
+		<where>
+			<if test="user_id!=null">user_id=#{user_id}</if>
+			<if test="depart_id!=null">and depart_id=#{depart_id}</if>	
+		</where>
+	</select>
+	
+	<select id="queryDepartsByUser" parameterType="String" resultType="String">
+		SELECT GROUP_CONCAT(depart_id) from sys_user_depart WHERE user_id=#{id}
+	</select>
+</mapper>
